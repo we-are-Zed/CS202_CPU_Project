@@ -18,23 +18,18 @@ module cpu_top(
 wire [3:0] gpio_e_out;
 wire rst;
 wire clk;
-wire nvic_clk;//中断控制器的时钟
 wire uart_clk;//串口的时钟
-wire systick_clk;//系统滴答定时器的时钟
 wire rd_write_en;//控制是否向寄存器堆中的rd写入数据
-wire rt_write_en;//控制是否向寄存器堆中的rt写入数据
+
 wire alu_use;//控制是否使用ALU
 wire mem_write_en;//控制是否向内存写入数据
 wire io_write_en;//控制是否向外设写入数据
-wire is_sw//是否是存储器访问指令
-wire io_target//是否是外设目标指令
-wire is_usage_fault//是否是使用错误
-wire curr_gpio_type//当前的gpio类型
-wire[1:0] alu_type;//ALU的类型
+
+//wire curr_gpio_type//当前的gpio类型
+//wire[1:0] alu_type;//ALU的类型
 wire[4:0] rd;//目标寄存器的编号
-wire[4:0] rs;//源寄存器的编号
-wire[4:0] rt;//第二个源寄存器的编号
-wire[4:0] shamt;//移位量
+wire[4:0] rs1;//源寄存器的编号
+wire[4:0] rs2;//第二个源寄存器的编号
 wire[5:0] opcode;//操作码
 wire[5:0] fun;//功能码
 wire[5:0] gpio_types;//gpio的类型
