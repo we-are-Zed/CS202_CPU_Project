@@ -26,5 +26,5 @@ module ifetch(
 
 );
 wire [31:0] instruction;
-wire [31:0] target_addr;
+wire [31:0] target_addr;//
 endmodule
