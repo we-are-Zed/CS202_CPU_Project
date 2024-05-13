@@ -1,9 +1,8 @@
 `timescale 1ns / 1ps
 module ALU (
     input alu_use,
-    input [1:0] alu_type,
+    //input [1:0] alu_type,
     input [4:0] rd,//目标寄存器的编号
-    input [4:0] shamt,//移位量
     input [5:0] opcode,
     input [5:0] fun,
     input [15:0] immediate,
