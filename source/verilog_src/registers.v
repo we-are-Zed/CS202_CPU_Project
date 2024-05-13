@@ -1,4 +1,4 @@
-module register(
+module registers(
 input clk,
 input rst,
 input[4:0] rs1,

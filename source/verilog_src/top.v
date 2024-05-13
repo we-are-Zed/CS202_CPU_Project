@@ -21,8 +21,8 @@ wire clk;
 wire nvic_clk;//中断控制器的时钟
 wire uart_clk;//串口的时钟
 wire systick_clk;//系统滴答定时器的时钟
-wire rd_write_en;//控制是否向寄存器堆中的rd写入数据
-wire rt_write_en;//控制是否向寄存器堆中的rt写入数据
+//wire rd_write_en;  控制是否向寄存器堆中的rd写入数据
+//wire rt_write_en;  控制是否向寄存器堆中的rt写入数据
 wire alu_use;//控制是否使用ALU
 wire mem_write_en;//控制是否向内存写入数据
 wire io_write_en;//控制是否向外设写入数据
@@ -31,9 +31,9 @@ wire io_target//是否是外设目标指令
 wire is_usage_fault//是否是使用错误
 wire curr_gpio_type//当前的gpio类型
 wire[1:0] alu_type;//ALU的类型
-wire[4:0] rd;//目标寄存器的编号
-wire[4:0] rs;//源寄存器的编号
-wire[4:0] rt;//第二个源寄存器的编号
+wire[4:0] wr;//目标寄存器的编号
+wire[4:0] rs1;//源寄存器的编号
+wire[4:0] rs2;//第二个源寄存器的编号
 wire[4:0] shamt;//移位量
 wire[5:0] opcode;//操作码
 wire[5:0] fun;//功能码
@@ -41,7 +41,20 @@ wire[5:0] gpio_types;//gpio的类型
 wire[5:0] exti_en;//外部中断的使能
 wire[9:0] io_access_addr;//外设的地址
 wire[15:0] immediate;//立即数
+wire[31:0]ReadData1,ReadData2,WriteData;// data in register
+wire RegWrite//the signal of register
 ALU alu(
 
+)
+registers reg(
+       .clk(clk),
+       .rst(rst),
+       .rs1(rs1),
+       .rs2(rs2),
+       .wr(wr),
+       .RegWrite(RegWrite),
+       .ReadData1(ReadData1),
+       .ReadData2(ReadData2),
+       .WriteData(WriteData)
 )
 endmodule
