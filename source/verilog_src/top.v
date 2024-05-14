@@ -57,7 +57,7 @@ module cpu_top(
         .zero(zero),
         .less(less)
     );
-    wire[31:0]WriteData;
+    wire[31:0]ReadDataone,ReadDatatwo,WriteData;
     wire[4:0] wr;//目标寄存器的编号
     wire[4:0] rs1;//源寄存器的编号
     wire[4:0] rs2;//第二个源寄存器的编号
@@ -68,8 +68,8 @@ module cpu_top(
        .rs2(rs2),
        .wr(wr),
        .RegWrite(RegWrite),
-       .ReadData1(ReadData1),
-       .ReadData2(ReadData2),
+       .ReadData1(ReadDataone),
+       .ReadData2(ReadDatatwo),
        .WriteData(WriteData)
 )
     PC pc(clk, rst, NextPC, PC);
