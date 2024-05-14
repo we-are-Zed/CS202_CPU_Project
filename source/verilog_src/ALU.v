@@ -17,6 +17,9 @@ module ALU(
     assign operand2 = (ALUSrc) ? imm32 : ReadData2;
 
     always @(*) begin
+
+        zero = 0;
+        less = 0;
         if(Jump) begin
            ALUResult = (ReadData1 + operand2) & ~1;
         end
@@ -63,6 +66,12 @@ module ALU(
                     10'b0100000_000: ALUResult = ReadData1 - operand2; // sub
                     10'b0000000_111: ALUResult = ReadData1 & operand2; // and
                     10'b0000000_110: ALUResult = ReadData1 | operand2; // or
+                    10'b0000000_100: ALUResult = ReadData1 ^ operand2; // xor
+                    10'b0000000_001: ALUResult = ReadData1 << operand2; // sll
+                    10'b0100000_101: ALUResult = ReadData1 >> operand2; // sra
+                    10'b0000000_101: ALUResult = ReadData1 >>> operand2; // srl
+                    10'b0000000_010: ALUResult = ($signed(ReadData1) < $signed(operand2)); // slt
+                    10'b0000000_011: ALUResult = (ReadData1 < operand2); // sltu
                     default: ALUResult = 32'b0; 
                 endcase
             end
