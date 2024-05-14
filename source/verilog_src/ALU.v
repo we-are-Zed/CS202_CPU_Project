@@ -5,7 +5,7 @@ module ALU(
     input [1:0] ALUOp,
     input [2:0] funct3,
     input [6:0] funct7,
-    input ALUSrc,
+    input ALUSrc,//selects the source of operand2. If it is 1’b0, the operand2 is ReadData2, and if it is 1’b1, imm32 is used.
     output reg [31:0] ALUResult,
     output zero
 );
@@ -16,11 +16,11 @@ module ALU(
     always @(*) begin
         case(ALUOp)
             2'b00: begin
-                // (lw, sw)
+                // (lw, sw)指令
                 ALUResult = ReadData1 + operand2;
             end
             2'b01: begin
-                // Branch instruction
+                // Branch instruction计算地址
                 ALUResult = ReadData1 - operand2;
             end
             2'b10: begin

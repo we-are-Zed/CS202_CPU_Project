@@ -58,9 +58,43 @@ module Controller(
                 ALUSrc = 1;
             end
             BRANCH: begin
-                Branch = (funct3 == 3'b000); // 仅在beq指令时Branch为1
-                ALUOp = 2'b01;
+                case(funct3)
+                    3'b000: begin
+                        ALUOp = 2'b01;//beq
+                        Branch = 1;
+                    end
+                    3'b001: begin
+                        ALUOp = 2'b01;//bne
+                        Branch = 1;
+                    end
+                    3'b100: begin
+                        ALUOp = 2'b01;//blt
+                        Branch = 1;
+                    end
+                    3'b101: begin
+                        ALUOp = 2'b01;//bge
+                        Branch = 1;
+                    end
+                    3'b110: begin
+                        ALUOp = 2'b01;//bltu
+                        Branch = 1;
+                    end
+                    3'b111: begin
+                        ALUOp = 2'b01;//bgeu
+                        Branch = 1;
+                    end
+                    default:begin
+                        Branch = 0;
+                        ALUOp = 2'b00;
+                    end
+            endcase
             end
+           // JALR: begin
+                RegWrite = 1;
+                ALUOp = 2'b00;
+                ALUSrc = 1;
+            //end
+            //不确定jalr的ALUOp是多少以及需不要用
             default: begin
                 // 对于未定义的操作码，保持所有信号为0
             end

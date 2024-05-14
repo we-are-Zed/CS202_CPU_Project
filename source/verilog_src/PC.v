@@ -2,7 +2,7 @@
 
 module PC(clk,rst,NextPC,PC);
     input clk;
-    input rst;
+    input rst;//复位信号，低电平有效
     input [31:0] NextPC;
     output reg[31:0] PC;
     
