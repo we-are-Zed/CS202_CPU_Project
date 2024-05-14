@@ -1,51 +1,42 @@
-`timescale 1ns / 1ps
-module ALU (
-    input alu_use,
-    //input [1:0] alu_type,
-    input [4:0] rd,//目标寄存器的编号
-    input [5:0] opcode,
-    input [5:0] fun,
-    input [15:0] immediate,
-    input [31:0] rs1,//源寄存器的值
-    input [31:0] rs2,//目标寄存器的值或者第二个源寄存器的值
-    output reg[31:0] result,
-    output isFalse//标注是否发生错误
-
+module ALU(
+    input [31:0] ReadData1,
+    input [31:0] ReadData2,
+    input [31:0] imm32,
+    input [1:0] ALUOp,
+    input [2:0] funct3,
+    input [6:0] funct7,
+    input ALUSrc,
+    output reg [31:0] ALUResult,
+    output zero
 );
-wire [31:0] immExt_signed;
-wire [31:0] immExt_unsigned;
-assign immExt_signed = {{16{immediate[15]}}, immediate};
-assign immExt_unsigned = {{16{1'b0}}, immediate};
 
-always @(alu_use,alu_type,opcode,fun,immediate,rs1,rs2)
-    isFalse = 0;
-    result=0;
-    if(alu_use){
-        if(alu_type==2'b01){//R-type
-            case (fun)
-               6'b100000: begin//说明是加法
-                result = rs1 + rs2;
-                if(rs1[31]==rs2[31] && rs1[31]!=result[31])//overflow
-                    isFalse = 1;
-               end
-                6'b100010: begin//说明是减法
-                 result = rs1 - rs2;
-                 if(rs1[31]!=rs2[31] && rs1[31]!=result[31])//overflow
-                      isFalse = 1;
-                end
-                dafault: begin
-                    isFalse = 1;
-                    result = 0;
-                end
-                
-            endcase
-        }else if(alu_type==2'b00){//I-type
-            if(opcode==6'b001000){
-                result = rs1 + immExt_signed;
-                if(rs1[31]==immExt_signed[31] && rs1[31]!=result[31])//overflow
-                    isFalse = 1;
-            }
-        }
-    }
-    
+    wire [31:0] operand2;
+    assign operand2 = (ALUSrc) ? imm32 : ReadData2;
+
+    always @(*) begin
+        case(ALUOp)
+            2'b00: begin
+                // (lw, sw)
+                ALUResult = ReadData1 + operand2;
+            end
+            2'b01: begin
+                // Branch instruction
+                ALUResult = ReadData1 - operand2;
+            end
+            2'b10: begin
+                // R-type instructions
+                case({funct7, funct3})
+                    10'b0000000_000: ALUResult = ReadData1 + operand2; // add
+                    10'b0100000_000: ALUResult = ReadData1 - operand2; // sub
+                    10'b0000000_111: ALUResult = ReadData1 & operand2; // and
+                    10'b0000000_110: ALUResult = ReadData1 | operand2; // or
+                    default: ALUResult = 32'b0; 
+                endcase
+            end
+            default: ALUResult = 32'b0; 
+        endcase
+    end
+
+    assign zero = (ALUResult == 32'b0) ? 1'b1 : 1'b0;
+
 endmodule
