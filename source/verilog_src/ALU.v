@@ -5,23 +5,56 @@ module ALU(
     input [1:0] ALUOp,
     input [2:0] funct3,
     input [6:0] funct7,
+    input [2:0] BranchType,
+    input Jump,
     input ALUSrc,//selects the source of operand2. If it is 1’b0, the operand2 is ReadData2, and if it is 1’b1, imm32 is used.
     output reg [31:0] ALUResult,
-    output zero
+    output zero,
+    output reg less
 );
 
     wire [31:0] operand2;
     assign operand2 = (ALUSrc) ? imm32 : ReadData2;
 
     always @(*) begin
+        if(Jump) begin
+           ALUResult = (ReadData1 + operand2) & ~1;
+        end
+        else begin
+
         case(ALUOp)
             2'b00: begin
                 // (lw, sw)指令
                 ALUResult = ReadData1 + operand2;
             end
             2'b01: begin
-                // Branch instruction计算地址
-                ALUResult = ReadData1 - operand2;
+                case(BranchType)
+                     3'b000:begin//beq
+                  ALUResult =ReadData1-operand2;
+                  zero=(ALUResult==32'b0);
+                  end
+                    3'b001:begin//bne
+                    ALUResult =ReadData1-operand2;
+                    zero=(ALUResult!=32'b0);
+                    end
+                    3'b100:begin//blt
+                    less = ($signed(ReadData1) < $signed(operand2));
+                    end
+                    3'b101: begin // bge
+                            less = ($signed(ReadData1) >= $signed(operand2));
+                        end
+                    3'b110: begin // bltu
+                            less = (ReadData1 < operand2);
+                        end
+                        3'b111: begin // bgeu
+                            less = (ReadData1 >= operand2);
+                        end
+                        default:begin
+                       zero=1'b0;
+                          less=1'b0;
+                    end
+            endcase
+            
             end
             2'b10: begin
                 // R-type instructions
@@ -36,7 +69,7 @@ module ALU(
             default: ALUResult = 32'b0; 
         endcase
     end
+end
 
-    assign zero = (ALUResult == 32'b0) ? 1'b1 : 1'b0;
 
 endmodule
