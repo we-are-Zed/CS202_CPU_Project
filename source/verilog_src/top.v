@@ -57,7 +57,7 @@ module cpu_top(
         .zero(zero),
         .less(less)
     );
-    wire[31:0]ReadData1,ReadData2,WriteData;
+    wire[31:0]WriteData;
     wire[4:0] wr;//目标寄存器的编号
     wire[4:0] rs1;//源寄存器的编号
     wire[4:0] rs2;//第二个源寄存器的编号
