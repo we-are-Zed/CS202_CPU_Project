@@ -8,9 +8,7 @@ input RegWrite,
 input [31:0] WriteData,
 output[31:0] ReadData1,
 output[31:0]ReadData2
-)
-
-;
+);
 reg[31:0] regs[0:31];//register file
 integer i;
 always @(posedge clk or posedge rst) begin
