@@ -33,7 +33,7 @@ module cpu_top(
     assign funct7 = inst[31:25];
 
     assign operand2 = (ALUSrc) ? imm32 : ReadData2;
-
+    
     //wire先不删，可能会用到
     //首先实例化cpuclk
     //再实例化if拿到数据
@@ -101,5 +101,14 @@ module cpu_top(
             NextPC = PC + 4;
         end
     end
+    //Part for uart 
+    // UART Programmer Pinouts
+    wire upg_clk, upg_clk_o;
+    wire upg_wen_o; //Uart write out enable
+    wire upg_done_o; //Uart rx data have done
+    //data to which memory unit of program_rom/dmemory32
+    wire [14:0] upg_adr_o;
+    //data to program_rom or dmemory32
+    wire [31:0] upg_dat_o;
 
 endmodule
