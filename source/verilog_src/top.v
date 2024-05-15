@@ -69,7 +69,7 @@ module cpu_top(
     wire[4:0] wr;//目标寄存器的编号
     wire[4:0] rs1;//源寄存器的编号
     wire[4:0] rs2;//第二个源寄存器的编号
-    registers reg(
+    registers regi(
        .clk(clk),
        .rst(rst),
        .rs1(rs1),
@@ -79,7 +79,7 @@ module cpu_top(
        .ReadData1(ReadDataone),
        .ReadData2(ReadDatatwo),
        .WriteData(WriteData)
-)
+);
     PC pc(clk, rst, NextPC, PC);
 
     // 跳转j类型或分支类型的PC更新逻辑
