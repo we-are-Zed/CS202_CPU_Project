@@ -2,18 +2,18 @@
 module cpu_top(
     input clk,
     input rst,//复位信号，低电平有效
-    input [31:0] inst,
-    input [31:0] ReadData1,
-    input [31:0] ReadData2,
-    input [31:0] imm32,
-    output [31:0] ALUResult,
-    output zero,
-    output less
+    //input [31:0] inst,
+    //input [31:0] ReadData1,
+    //input [31:0] ReadData2,
+    //input [31:0] imm32,
+    //output [31:0] ALUResult,
+    //output zero,
+    //output less
 );
 
     wire [31:0] operand2;
     wire [31:0] PC;
-    wire [31:0] NextPC;
+    reg [31:0] NextPC;
     wire [1:0] ALUOp;
     wire [2:0] funct3;
     wire [6:0] funct7;
@@ -31,6 +31,11 @@ module cpu_top(
 
     assign operand2 = (ALUSrc) ? imm32 : ReadData2;
 
+    //wire先不删，可能会用到
+    //首先实例化cpuclk
+    //再实例化if拿到数据
+    //这里可能还需要实例化registers
+    //然后实例化controller
     Controller controller(
         .inst(inst),
         .Branch(Branch),
