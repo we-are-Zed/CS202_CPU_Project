@@ -2,6 +2,9 @@
 module cpu_top(
     input clk,
     input rst,//复位信号，低电平有效
+    // uart part
+    input start_pg,rx,
+    output tx
     //input [31:0] inst,
     //input [31:0] ReadData1,
     //input [31:0] ReadData2,
