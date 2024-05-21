@@ -2,22 +2,17 @@
 module cpu_top(
     input clk,
     input rst,//复位信号，低电平有效
-    // uart part
     input start_pg,rx,
     output tx
-    //input [31:0] inst,
-    //input [31:0] ReadData1,
-    //input [31:0] ReadData2,
-    //input [31:0] imm32,
-    //output [31:0] ALUResult,
-    //output zero,
-    //output less
+   
 );
 
-    wire [31:0] operand2;
     wire [31:0] PC;
     reg [31:0] NextPC;
+    wire [31:0] inst;
     wire [1:0] ALUOp;
+    wire [31:0] ReadData1, ReadData2, imm32;
+    wire [31:0] ALUResult;
     wire [2:0] funct3;
     wire [6:0] funct7;
     wire ALUSrc;
@@ -27,18 +22,53 @@ module cpu_top(
     wire MemWrite;
     wire RegWrite;
     wire Jump;
+    wire zero;
     wire [2:0] BranchType;
+    wire less;
+    wire [31:0] WriteData;
+    wire [31:0] ram_data;
+
+wire[4:0] wr;//目标寄存器的编号
+    wire[4:0] rs1;//源寄存器的编号
+    wire[4:0] rs2;//第二个源寄存器的编号
+
 
     assign funct3 = inst[14:12];
     assign funct7 = inst[31:25];
 
-    assign operand2 = (ALUSrc) ? imm32 : ReadData2;
     
     //wire先不删，可能会用到
     //首先实例化cpuclk
     //再实例化if拿到数据
-    //这里可能还需要实例化registers
+    //这里可能还需要实例化registers(已经在decoder里面实例化了)
     //然后实例化controller
+ 
+   PC pc(
+    .clk(clk),
+    .rst(rst),
+    .NextPC(NextPC),
+    .PC(PC)
+    );
+    IFetch ifetch(
+        .clk(clk),
+        .rst(rst),
+        .imm32(imm32),
+        .branch(Branch),
+        .zero(zero),
+        .inst(inst)
+    );
+    Decoder decoder(
+        .clk(clk),
+        .rst(rst),
+        .regWrite(RegWrite),
+        .inst(inst),
+        .writeData(WriteData),
+        .rs1Data(ReadData1),
+        .rs2Data(ReadData2),
+        .imm32(imm32)
+    );
+
+
     Controller controller(
         .inst(inst),
         .Branch(Branch),
@@ -65,34 +95,52 @@ module cpu_top(
         .zero(zero),
         .less(less)
     );
-    wire[31:0]ReadDataone,ReadDatatwo,WriteData;
-    wire[4:0] wr;//目标寄存器的编号
-    wire[4:0] rs1;//源寄存器的编号
-    wire[4:0] rs2;//第二个源寄存器的编号
-    registers regi(
-       .clk(clk),
-       .rst(rst),
-       .rs1(rs1),
-       .rs2(rs2),
-       .wr(wr),
-       .RegWrite(RegWrite),
-       .ReadData1(ReadDataone),
-       .ReadData2(ReadDatatwo),
-       .WriteData(WriteData)
-);
-    PC pc(clk, rst, NextPC, PC);
+
+    memory mem(
+        .ram_clk_i(clk),
+        .ram_wen_i(MemWrite),
+        .ram_adr_i(ALUResult[15:2]),
+        .ram_dat_i(ReadData2),
+        .ram_dat_o(ram_data),
+        
+        // UART这部分传入的数据我不确定
+        .upg_rst_i(rst),
+        .upg_clk_i(clk),
+        .upg_wen_i(MemWrite),
+        .upg_adr_i(ALUResult[15:2]),
+        .upg_dat_i(ReadData2),
+        .upg_done_i(1'b1)
+    );
+
+    programrom progrom(
+    .rom_clk_i(clk),
+    .rom_adr_i(PC[15:2]),
+    .Instruction_o(inst),
+
+     // UART这部分传入的数据我不确定(同上 相信copilot)
+    .upg_rst_i(rst),
+    .upg_clk_i(clk),
+    .upg_wen_i(MemWrite),
+    .upg_adr_i(ALUResult[15:2]),
+    .upg_dat_i(ReadData2),
+    .upg_done_i(1'b1)
+
+    );
+
+    
+   
 
     // 跳转j类型或分支类型的PC更新逻辑
     //没想好PC的更新逻辑放在这里妥不妥
     always @(*) begin
         if (Branch) begin
             case (BranchType)
-                3'b000: if (zero) NextPC = PC + (imm32 << 1); // beq
-                3'b001: if (!zero) NextPC = PC + (imm32 << 1); // bne
-                3'b100: if (less) NextPC = PC + (imm32 << 1); // blt
-                3'b101: if (!less) NextPC = PC + (imm32 << 1); // bge
-                3'b110: if (less) NextPC = PC + (imm32 << 1); // bltu
-                3'b111: if (!less) NextPC = PC + (imm32 << 1); // bgeu
+               3'b000: NextPC = zero ? (pc + (imm32 << 1)) : (pc + 4); // beq
+                3'b001: NextPC = !zero ? (pc + (imm32 << 1)) : (pc + 4); // bne
+                3'b100: NextPC = less ? (pc + (imm32 << 1)) : (pc + 4); // blt
+                3'b101: NextPC = !less ? (pc + (imm32 << 1)) : (pc + 4); // bge
+                3'b110: NextPC = less ? (pc + (imm32 << 1)) : (pc + 4); // bltu
+                3'b111: NextPC = !less ? (pc + (imm32 << 1)) : (pc + 4); // bgeu
                 default: NextPC = PC + 4;
             endcase
         end else if (Jump) begin
