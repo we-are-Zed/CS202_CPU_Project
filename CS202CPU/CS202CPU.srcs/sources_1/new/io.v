@@ -3,7 +3,7 @@ module io(
     input mWrite,
     input ioRead,
     input ioWrite,
-    input [31:0] addr_in,  // from alu_result in executs32 
+    input [31:0] addr_in,  // from alu_result 
     input[31:0]Mdata,//data from memory
     input[31:0]Rdata,//data from register files(idecode 32)
     input[15:0]kdata,//data from keyboard
