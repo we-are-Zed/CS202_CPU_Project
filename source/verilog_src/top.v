@@ -8,6 +8,10 @@ module cpu_top(
 
 
    wire clock;
+   //wire [23:0] button_i;
+   wire [15:0] button_out;
+
+
     wire [31:0] PC;
     reg [31:0] NextPC;
     wire [31:0] inst;
@@ -132,11 +136,19 @@ wire[4:0] wr;//目标寄存器的编号
         .Mdata(ram_data),
         .Rdata(ReadData1),
         .kdata(16'b0),
-        .bdata(16'b0),
+        .bdata(button_out),
         .addr(ALUResult),
         .r_data(ReadData2),
         .w_data(WriteData)
         );
+
+
+    botton button(
+        .clk(clock),
+        .rst(rst),
+        .button_in(button_in),
+        .button_out(button_out)
+    );
 
     // 跳转j类型或分支类型的PC更新逻辑
     //没想好PC的更新逻辑放在这里妥不妥
