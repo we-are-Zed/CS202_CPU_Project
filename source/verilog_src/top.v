@@ -42,8 +42,12 @@ wire[4:0] wr;//目标寄存器的编号
     //再实例化if拿到数据
     //这里可能还需要实例化registers(已经在decoder里面实例化了)
     //然后实例化controller
-
+    wire upg_clk;
+    wire cpu_clk;
     cpuclk cpuclk(
+         .clk_in1(clk),
+        .clk_out1(cpu_clk),
+        .clk_out2(upg_clk)
         
     );
 
