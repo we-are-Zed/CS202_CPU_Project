@@ -29,7 +29,7 @@ module cpu_top(
     wire [31:0] ram_data;
 
 wire[4:0] wr;//目标寄存器的编号
-    wire[4:0] rs1;//源寄存器的编�?
+    wire[4:0] rs1;//源寄存器的编号
     wire[4:0] rs2;//第二个源寄存器的编号
 
 
@@ -37,11 +37,17 @@ wire[4:0] wr;//目标寄存器的编号
     assign funct7 = inst[31:25];
 
     
-    //wire先不删，可能会用�?
+    //wire先不删，可能会用到
     //首先实例化cpuclk
     //再实例化if拿到数据
     //这里可能还需要实例化registers(已经在decoder里面实例化了)
     //然后实例化controller
+
+    clk_wiz_0 cpuclk(
+        
+    );
+
+
  
    PC pc(
     .clk(clk),
@@ -125,26 +131,39 @@ wire[4:0] wr;//目标寄存器的编号
     .upg_dat_i(ReadData2),
     .upg_done_i(1'b1)
 
-    );
+    );//指针内存需不需要实例化？
 
-    
-   
+
+     io sys_io(
+        .mRead(MemRead),
+        .mWrite(MemWrite),
+        .ioRead(MemtoReg),
+        .ioWrite(RegWrite),
+        .addr_in(ALUResult),
+        .Mdata(ram_data),
+        .Rdata(ReadData1),
+        .kdata(16'b0),
+        .bdata(16'b0),
+        .addr(ALUResult),
+        .r_data(ReadData2),
+        .w_data(WriteData)
+        );
 
     // 跳转j类型或分支类型的PC更新逻辑
-    //没想好PC的更新�?�辑放在这里妥不�?
+    //没想好PC的更新逻辑放在这里妥不妥
     always @(*) begin
         if (Branch) begin
             case (BranchType)
-               3'b000: NextPC = zero ? (pc + (imm32 << 1)) : (PC + 4); // beq
-                3'b001: NextPC = !zero ? (pc + (imm32 << 1)) : (PC + 4); // bne
-                3'b100: NextPC = less ? (pc + (imm32 << 1)) : (PC + 4); // blt
-                3'b101: NextPC = !less ? (pc + (imm32 << 1)) : (PC + 4); // bge
-                3'b110: NextPC = less ? (pc + (imm32 << 1)) : (PC + 4); // bltu
-                3'b111: NextPC = !less ? (pc + (imm32 << 1)) : (PC + 4); // bgeu
+               3'b000: NextPC = zero ? (pc + (imm32 << 1)) : (pc + 4); // beq
+                3'b001: NextPC = !zero ? (pc + (imm32 << 1)) : (pc + 4); // bne
+                3'b100: NextPC = less ? (pc + (imm32 << 1)) : (pc + 4); // blt
+                3'b101: NextPC = !less ? (pc + (imm32 << 1)) : (pc + 4); // bge
+                3'b110: NextPC = less ? (pc + (imm32 << 1)) : (pc + 4); // bltu
+                3'b111: NextPC = !less ? (pc + (imm32 << 1)) : (pc + 4); // bgeu
                 default: NextPC = PC + 4;
             endcase
         end else if (Jump) begin
-            NextPC = ALUResult; // 跳转指令（JALR �? JAL�?
+            NextPC = ALUResult; // 跳转指令（JALR 或 JAL）
         end else begin
             NextPC = PC + 4;
         end
