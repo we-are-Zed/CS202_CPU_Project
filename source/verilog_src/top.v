@@ -44,8 +44,9 @@ wire[4:0] wr;//目标寄存器的编号
     //然后实例化controller
 
     clk_wiz_0 cpuclk(
-        
+    .clk_in1(clk),    
     );
+
 
 
  
