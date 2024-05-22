@@ -6,11 +6,9 @@ module cpu_top(
     output wire [23:0] led_out
 );
 
-
    wire clock;
    //wire [23:0] button_i;
    wire [15:0] button_out;
-
 
     wire [31:0] PC;
     reg [31:0] NextPC;
@@ -53,15 +51,6 @@ wire[4:0] wr;//目标寄存器的编号
     .clk_out1(clock),
     );
 
-
-
- 
-   PC pc(
-    .clk(clock),
-    .rst(rst),
-    .NextPC(NextPC),
-    .PC(PC)
-    );
     IFetch ifetch(
         .clk(clock),
         .rst(rst),
@@ -70,6 +59,7 @@ wire[4:0] wr;//目标寄存器的编号
         .zero(zero),
         .inst(inst)
     );
+
     Decoder decoder(
         .clk(clock),
         .rst(rst),
@@ -124,8 +114,6 @@ wire[4:0] wr;//目标寄存器的编号
         .upg_dat_i(ReadData2),
         .upg_done_i(1'b1)
     );
-
-
 
      io sys_io(
         .mRead(MemRead),
