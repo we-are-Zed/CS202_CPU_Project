@@ -1,0 +1,19 @@
+#-----------------------------------------------------------
+# Vivado v2017.4 (64-bit)
+# SW Build 2086221 on Fri Dec 15 20:55:39 MST 2017
+# IP Build 2085800 on Fri Dec 15 22:25:07 MST 2017
+# Start of session at: Wed May 22 22:21:52 2024
+# Process ID: 20920
+# Current directory: E:/分类/实用/QQ/计算机/课程文件/计组/CPU/CS202_CPU_Project/CS202CPU
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent22820 E:\分类\实用\QQ\计算机\课程文件\计组\CPU\CS202_CPU_Project\CS202CPU\CS202CPU.xpr
+# Log file: E:/分类/实用/QQ/计算机/课程文件/计组/CPU/CS202_CPU_Project/CS202CPU/vivado.log
+# Journal file: E:/分类/实用/QQ/计算机/课程文件/计组/CPU/CS202_CPU_Project/CS202CPU\vivado.jou
+#-----------------------------------------------------------sstart_guiopen_INFO: [Common 17-206] Exiting Vivado at Wed May 22 22:22:25 2024...
+S202CPU/CS202CPU.xpr
+INFO: [Project 1-313] Project file moved from 'C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/CS202CPU' since last save.
+CRITICAL WARNING: [Project 1-311] Could not find the file 'E:/分类/实用/QQ/计算机/课程文件/计组/CPU/CS202_CPU_Project/CS202CPU/CS202CPU.srcs/sources_1/ip/prgrom/prgrom32.coe', nor could it be found using path 'C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/CS202CPU/CS202CPU.srcs/sources_1/ip/prgrom/prgrom32.coe'.
+ERROR: [Project 1-208] No val for DA Elab Attr
+Scanning sources...
+ERROR: [Common 17-70] Application Exception: SrcMgr::createSS : type not set
+exit
+INFO: [Common 17-206] Exiting Vivado at Wed May 22 22:22:31 2024...

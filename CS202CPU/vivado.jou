@@ -1,0 +1,14 @@
+#-----------------------------------------------------------
+add_files {C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/ip/prgrom/prgrom.xci C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/IFetch.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/PC.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/ip/uart_bmpg_0/uart_bmpg_0.xci C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/registers.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/ip/clk_wiz_0/clk_wiz_0.xci C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/ip/RAM/RAM.xci C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/Controller.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/top.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/programrom.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/Decoder.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/memory.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/ALU.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/io.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/ALUControl.v}
+update_compile_order -fileset sources_1
+update_compile_order -fileset sources_1
+# Vivado v2017.4 (64-bit)
+# SW Build 2086221 on Fri Dec 15 20:55:39 MST 2017
+# IP Build 2085800 on Fri Dec 15 22:25:07 MST 2017
+# Start of session at: Wed May 22 22:21:52 2024
+# Process ID: 20920
+# Current directory: E:/����/ʵ��/QQ/�����/�γ��ļ�/����/CPU/CS202_CPU_Project/CS202CPU
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent22820 E:\����\ʵ��\QQ\�����\�γ��ļ�\����\CPU\CS202_CPU_Project\CS202CPU\CS202CPU.xpr
+# Log file: E:/����/ʵ��/QQ/�����/�γ��ļ�/����/CPU/CS202_CPU_Project/CS202CPU/vivado.log
+# Journal file: E:/����/ʵ��/QQ/�����/�γ��ļ�/����/CPU/CS202_CPU_Project/CS202CPU\vivado.jou
+#-----------------------------------------------------------sstart_guiopen_project E:/����/ʵ��/QQ/�����/�γ��ļ�/����/CPU/CS202_CPU_Project/CS202CPU/CS202CPU.xpr
