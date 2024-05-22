@@ -29,7 +29,7 @@ module cpu_top(
     wire [31:0] ram_data;
 
 wire[4:0] wr;//目标寄存器的编号
-    wire[4:0] rs1;//源寄存器的编号
+    wire[4:0] rs1;//源寄存器的编�?
     wire[4:0] rs2;//第二个源寄存器的编号
 
 
@@ -37,7 +37,7 @@ wire[4:0] wr;//目标寄存器的编号
     assign funct7 = inst[31:25];
 
     
-    //wire先不删，可能会用到
+    //wire先不删，可能会用�?
     //首先实例化cpuclk
     //再实例化if拿到数据
     //这里可能还需要实例化registers(已经在decoder里面实例化了)
@@ -131,20 +131,20 @@ wire[4:0] wr;//目标寄存器的编号
    
 
     // 跳转j类型或分支类型的PC更新逻辑
-    //没想好PC的更新逻辑放在这里妥不妥
+    //没想好PC的更新�?�辑放在这里妥不�?
     always @(*) begin
         if (Branch) begin
             case (BranchType)
-               3'b000: NextPC = zero ? (pc + (imm32 << 1)) : (pc + 4); // beq
-                3'b001: NextPC = !zero ? (pc + (imm32 << 1)) : (pc + 4); // bne
-                3'b100: NextPC = less ? (pc + (imm32 << 1)) : (pc + 4); // blt
-                3'b101: NextPC = !less ? (pc + (imm32 << 1)) : (pc + 4); // bge
-                3'b110: NextPC = less ? (pc + (imm32 << 1)) : (pc + 4); // bltu
-                3'b111: NextPC = !less ? (pc + (imm32 << 1)) : (pc + 4); // bgeu
+               3'b000: NextPC = zero ? (pc + (imm32 << 1)) : (PC + 4); // beq
+                3'b001: NextPC = !zero ? (pc + (imm32 << 1)) : (PC + 4); // bne
+                3'b100: NextPC = less ? (pc + (imm32 << 1)) : (PC + 4); // blt
+                3'b101: NextPC = !less ? (pc + (imm32 << 1)) : (PC + 4); // bge
+                3'b110: NextPC = less ? (pc + (imm32 << 1)) : (PC + 4); // bltu
+                3'b111: NextPC = !less ? (pc + (imm32 << 1)) : (PC + 4); // bgeu
                 default: NextPC = PC + 4;
             endcase
         end else if (Jump) begin
-            NextPC = ALUResult; // 跳转指令（JALR 或 JAL）
+            NextPC = ALUResult; // 跳转指令（JALR �? JAL�?
         end else begin
             NextPC = PC + 4;
         end

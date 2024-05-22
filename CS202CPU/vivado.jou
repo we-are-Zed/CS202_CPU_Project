@@ -1,0 +1,21 @@
+#-----------------------------------------------------------
+# Vivado v2023.2 (64-bit)
+# SW Build 4029153 on Fri Oct 13 20:14:34 MDT 2023
+# IP Build 4028589 on Sat Oct 14 00:45:43 MDT 2023
+# SharedData Build 4025554 on Tue Oct 10 17:18:54 MDT 2023
+# Start of session at: Wed May 22 22:15:13 2024
+# Process ID: 3132
+# Current directory: C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/CS202CPU
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent6132 C:\Users\Lenovo\Documents\GitHub\CS202_CPU_Project\CS202CPU\CS202CPU.xpr
+# Log file: C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/CS202CPU/vivado.log
+# Journal file: C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/CS202CPU\vivado.jou
+# Running On: LAPTOP-KN6M2GCT, OS: Windows, CPU Frequency: 2688 MHz, CPU Physical cores: 14, Host memory: 16890 MB
+#-----------------------------------------------------------
+start_gui
+open_project C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/CS202CPU/CS202CPU.xpr
+upgrade_project -migrate_output_products
+update_compile_order -fileset sources_1
+report_ip_status -name ip_status 
+add_files {C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/ip/prgrom/prgrom.xci C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/IFetch.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/PC.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/ip/uart_bmpg_0/uart_bmpg_0.xci C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/registers.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/ip/clk_wiz_0/clk_wiz_0.xci C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/ip/RAM/RAM.xci C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/Controller.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/top.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/programrom.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/Decoder.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/memory.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/ALU.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/io.v C:/Users/Lenovo/Documents/GitHub/CS202_CPU_Project/source/verilog_src/ALUControl.v}
+update_compile_order -fileset sources_1
+update_compile_order -fileset sources_1
