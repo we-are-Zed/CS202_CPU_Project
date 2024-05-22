@@ -7,6 +7,7 @@ module cpu_top(
 );
 
    wire clock;
+    wire uart_clk;
    //wire [23:0] button_i;
    wire [15:0] button_out;
 
@@ -49,6 +50,7 @@ wire[4:0] wr;//目标寄存器的编号
     clk_wiz_0 cpuclk(
     .clk_in1(clk),
     .clk_out1(clock),
+        .clk_out2(uart_clk)
     );
 
     IFetch ifetch(
