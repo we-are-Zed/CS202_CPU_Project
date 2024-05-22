@@ -43,7 +43,7 @@ wire[4:0] wr;//目标寄存器的编号
     //这里可能还需要实例化registers(已经在decoder里面实例化了)
     //然后实例化controller
 
-    clk_wiz_0 cpuclk(
+    cpuclk cpuclk(
         
     );
 
