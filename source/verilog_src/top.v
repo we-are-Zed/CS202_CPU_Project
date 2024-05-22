@@ -2,11 +2,12 @@
 module cpu_top(
     input clk,
     input rst,//复位信号，低电平有效
-    input start_pg,rx,
-    output tx
-   
+    input [23:0] button_in,
+    output wire [23:0] led_out
 );
 
+
+   wire clock;
     wire [31:0] PC;
     reg [31:0] NextPC;
     wire [31:0] inst;
@@ -42,26 +43,23 @@ wire[4:0] wr;//目标寄存器的编号
     //再实例化if拿到数据
     //这里可能还需要实例化registers(已经在decoder里面实例化了)
     //然后实例化controller
-    wire upg_clk;
-    wire cpu_clk;
-    cpuclk cpuclk(
-         .clk_in1(clk),
-        .clk_out1(cpu_clk),
-        .clk_out2(upg_clk)
-        
+
+    clk_wiz_0 cpuclk(
+    .clk_in1(clk),
+    .clk_out1(clock),
     );
 
 
 
  
    PC pc(
-    .clk(clk),
+    .clk(clock),
     .rst(rst),
     .NextPC(NextPC),
     .PC(PC)
     );
     IFetch ifetch(
-        .clk(clk),
+        .clk(clock),
         .rst(rst),
         .imm32(imm32),
         .branch(Branch),
@@ -69,7 +67,7 @@ wire[4:0] wr;//目标寄存器的编号
         .inst(inst)
     );
     Decoder decoder(
-        .clk(clk),
+        .clk(clock),
         .rst(rst),
         .regWrite(RegWrite),
         .inst(inst),
@@ -108,7 +106,7 @@ wire[4:0] wr;//目标寄存器的编号
     );
 
     memory mem(
-        .ram_clk_i(clk),
+        .ram_clk_i(clock),
         .ram_wen_i(MemWrite),
         .ram_adr_i(ALUResult[15:2]),
         .ram_dat_i(ReadData2),
@@ -116,27 +114,13 @@ wire[4:0] wr;//目标寄存器的编号
         
         // UART这部分传入的数据我不确定
         .upg_rst_i(rst),
-        .upg_clk_i(clk),
+        .upg_clk_i(clock),
         .upg_wen_i(MemWrite),
         .upg_adr_i(ALUResult[15:2]),
         .upg_dat_i(ReadData2),
         .upg_done_i(1'b1)
     );
 
-    programrom progrom(
-    .rom_clk_i(clk),
-    .rom_adr_i(PC[15:2]),
-    .Instruction_o(inst),
-
-     // UART这部分传入的数据我不确定(同上 相信copilot)
-    .upg_rst_i(rst),
-    .upg_clk_i(clk),
-    .upg_wen_i(MemWrite),
-    .upg_adr_i(ALUResult[15:2]),
-    .upg_dat_i(ReadData2),
-    .upg_done_i(1'b1)
-
-    );//指针内存需不需要实例化？
 
 
      io sys_io(
