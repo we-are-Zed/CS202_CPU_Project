@@ -153,6 +153,15 @@ wire[4:0] wr;//目标寄存器的编号
         .button_out(button_out)
     );
 
+    leds led24(
+    .led_clk(clock),
+    .ledrst(rst),
+    .ledwrite(RegWrite),
+    .ledcs(ledctrl),
+    .ledaddr(2'b00),//现在还未知,疑似是switch2N4的一些东西,直接读取拨码开关
+    .ledwdata(WriteData[15:0]),
+    .ledout(led_out)
+    );
     // 跳转j类型或分支类型的PC更新逻辑
     //没想好PC的更新逻辑放在这里妥不妥
     always @(*) begin
