@@ -6,11 +6,10 @@ module cpu_top(
     output wire [23:0] led_out
 );
 
-
    wire clock;
+    wire uart_clk;
    //wire [23:0] button_i;
    wire [15:0] button_out;
-
 
     wire [31:0] PC;
     reg [31:0] NextPC;
@@ -51,17 +50,9 @@ wire[4:0] wr;//目标寄存器的编号
     clk_wiz_0 cpuclk(
     .clk_in1(clk),
     .clk_out1(clock),
+        .clk_out2(uart_clk)
     );
 
-
-
- 
-   PC pc(
-    .clk(clock),
-    .rst(rst),
-    .NextPC(NextPC),
-    .PC(PC)
-    );
     IFetch ifetch(
         .clk(clock),
         .rst(rst),
@@ -70,6 +61,7 @@ wire[4:0] wr;//目标寄存器的编号
         .zero(zero),
         .inst(inst)
     );
+
     Decoder decoder(
         .clk(clock),
         .rst(rst),

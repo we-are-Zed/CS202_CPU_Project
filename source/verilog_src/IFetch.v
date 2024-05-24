@@ -16,6 +16,7 @@ module IFetch(
         .rom_clk_i(clk),
         .rom_adr_i(addra),
         .Instruction_o(instruction),
+        //uart
         .upg_rst_i(upg_rst_i),
         .upg_clk_i(upg_clk_i),
         .upg_wen_i(upg_wen_i),
@@ -28,7 +29,7 @@ module IFetch(
     assign addra = pc[15:2];
 
     // 在负边沿更新PC值
-    always @(negedge clk) begin
+    always @(negedge clk or negedge rst) begin
         if (!rst)
             pc <= 32'h00000000; // 同步复位，低电平有效
         else
