@@ -158,7 +158,7 @@ wire[4:0] wr;//目标寄存器的编号
     .ledrst(rst),
     .ledwrite(RegWrite),
     .ledcs(ledctrl),
-    .ledaddr(2'b00),//现在还未知,疑似是switch2N4的一些东西,直接读取拨码开关
+    .ledaddr(2'b00),//直接取末16位
     .ledwdata(WriteData[15:0]),
     .ledout(led_out)
     );
