@@ -118,7 +118,9 @@ wire[4:0] wr;//目标寄存器的编号
     );
 
     
-
+     wire switchctrl;
+     wire ledctrl;
+     wire ioread_data;
      io sys_io(
         .mRead(MemRead),
         .mWrite(MemWrite),
@@ -127,17 +129,26 @@ wire[4:0] wr;//目标寄存器的编号
         .addr_in(ALUResult),
         .Mdata(ram_data),
         .Rdata(ReadData1),
-        .kdata(16'b0),
-        .bdata(button_out),
+        .bdata(ioread_data),//data from button(io)
         .addr(ALUResult),
         .r_data(ReadData2),
-        .w_data(WriteData)
+        .w_data(WriteData),
+        .LEDCtrl(ledctrl),
+        .SwitchCtrl(switchctrl)
         );
+    ioread ioread(
+        .reset(rst),
+        .ior(MemtoReg),
+        .switchctrl(switchctrl),
+        .ioread_data(ioread_data),//data to io
+        .ioread_data_switch(button_out)//data from button
+    );
 
 
-    botton button(
+    button button(
         .clk(clock),
         .rst(rst),
+        .switchctrl(switchctrl)
         .button_in(button_in),
         .button_out(button_out)
     );
