@@ -150,7 +150,7 @@ wire[4:0] wr;//目标寄存器的编号
     button button(
         .clk(clock),
         .rst(rst),
-        .switchctrl(switchctrl)
+        .switchctrl(switchctrl),
         .button_in(button_in),
         .button_out(button_out)
     );
