@@ -4,6 +4,7 @@ module cpu_top(
     input rst,//复位信号，低电平有效
     input [23:0] button_in,
     output wire [23:0] led_out
+    output [7:0] seg_out
 );
 
    wire clock;
@@ -151,6 +152,18 @@ wire[4:0] wr;//目标寄存器的编号
         .switchctrl(switchctrl)
         .button_in(button_in),
         .button_out(button_out)
+    );
+    wire [15:0]seg_data;
+    seg_ctrl seg_ctrl(
+        .clk(clock),
+        .rst(rst),
+        .ctrl(ledctrl),
+        .seg_in(WriteData[15:0]),
+        .seg_out(seg_data)
+    );
+    seg_transform seg_transform(
+        .seg_in(seg_data),
+        .seg_out(seg_out)
     );
 
     leds led24(
