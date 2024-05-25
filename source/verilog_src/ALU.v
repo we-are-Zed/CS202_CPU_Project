@@ -9,7 +9,7 @@ module ALU(
     input Jump,
     input ALUSrc,//selects the source of operand2. If it is 1’b0, the operand2 is ReadData2, and if it is 1’b1, imm32 is used.
     output reg [31:0] ALUResult,
-    output zero,
+    output reg zero,
     output reg less
 );
 
