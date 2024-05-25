@@ -3,7 +3,7 @@ module cpu_top(
     input clk,
     input rst,//复位信号，低电平有效
     input [23:0] button_in,
-    output wire [23:0] led_out
+    output wire [23:0] led_out,
     output [7:0] seg_out
 );
 
@@ -12,7 +12,7 @@ module cpu_top(
    //wire [23:0] button_i;
    wire [15:0] button_out;
 
-    wire [31:0] PC;
+    wire [31:0] pc;
     reg [31:0] NextPC;
     wire [31:0] inst;
     wire [1:0] ALUOp;
@@ -115,7 +115,7 @@ wire[4:0] wr;//目标寄存器的编号
         .upg_wen_i(MemWrite),
         .upg_adr_i(ALUResult[15:2]),
         .upg_dat_i(ReadData2),
-        .upg_done_i(1'b1)
+        .upg_done_i(1'b1),
         .funct3(funct3)
     );
 
@@ -187,12 +187,12 @@ wire[4:0] wr;//目标寄存器的编号
                 3'b101: NextPC = !less ? (pc + (imm32 << 1)) : (pc + 4); // bge
                 3'b110: NextPC = less ? (pc + (imm32 << 1)) : (pc + 4); // bltu
                 3'b111: NextPC = !less ? (pc + (imm32 << 1)) : (pc + 4); // bgeu
-                default: NextPC = PC + 4;
+                default: NextPC = pc + 4;
             endcase
         end else if (Jump) begin
             NextPC = ALUResult; // 跳转指令（JALR 或 JAL）
         end else begin
-            NextPC = PC + 4;
+            NextPC = pc + 4;
         end
     end
     //Part for uart 
