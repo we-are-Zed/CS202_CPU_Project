@@ -3,11 +3,17 @@ module Decoder(
     input rst,
     input regWrite,
     input [31:0] inst,
-    input [31:0] writeData,
+    
+    input [31:0] ReadData,//来自ram或者io
+    input [31:0] ALUresult,//来自alu
+    input RegWrite,
+    input MemtoReg,
+ 
     output [31:0] rs1Data,
     output [31:0] rs2Data,
     output reg [31:0] imm32
 );
+     reg [31:0] writeData,
     reg [31:0] registers [0:31]; // 32个32位寄存器
     wire [4:0] rs1, rs2, rd;
     wire [6:0] opcode;
@@ -24,6 +30,17 @@ module Decoder(
     // 读取寄存器数据
     assign rs1Data = registers[rs1];
     assign rs2Data = registers[rs2];
+
+always @(*) begin
+    if (RegWrite) begin
+        if (MemtoReg) begin
+            writeData = ReadData;
+        end else begin
+            writeData = ALUresult;
+        end
+    end
+end
+
 
     // 在时钟上升沿写入寄存器
     always @(posedge clk or negedge rst) begin

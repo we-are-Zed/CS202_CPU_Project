@@ -6,6 +6,8 @@ module ALU(
     input [2:0] funct3,
     input [6:0] funct7,
     input [2:0] BranchType,
+    input lw,
+    input sw,
     input Jump,
     input ALUSrc,//selects the source of operand2. If it is 1’b0, the operand2 is ReadData2, and if it is 1’b1, imm32 is used.
     output reg [31:0] ALUResult,
@@ -27,8 +29,25 @@ module ALU(
 
         case(ALUOp)
             2'b00: begin
-                // (lw, sw)指令
-                ALUResult = ReadData1 + operand2;
+                //I-type instructions
+                case(funct3)
+                    3'b000: ALUResult = ReadData1 + operand2; // addi
+                    3'b111: ALUResult = ReadData1 & operand2; // andi
+                    3'b110: ALUResult = ReadData1 | operand2; // ori
+                    3'b100: ALUResult = ReadData1 ^ operand2; // xori
+                    3'b001: ALUResult = ReadData1 << operand2; // slli
+                    3'b101: begin
+                        if(funct7[5] == 1) begin
+                            ALUResult = ReadData1 >> operand2; // srai
+                        end
+                        else begin
+                            ALUResult = ReadData1 >>> operand2; // srli
+                        end
+                    end
+                    3'b010: ALUResult = ReadData1 + operand2; // sw lw
+                    3'b011: ALUResult = (ReadData1 < operand2); // sltiu
+                    default: ALUResult = 32'b0;
+                endcase
             end
             2'b01: begin
                 case(BranchType)
