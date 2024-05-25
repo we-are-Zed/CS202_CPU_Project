@@ -116,6 +116,7 @@ wire[4:0] wr;//目标寄存器的编号
         .upg_adr_i(ALUResult[15:2]),
         .upg_dat_i(ReadData2),
         .upg_done_i(1'b1)
+        .funct3(funct3)
     );
 
     
