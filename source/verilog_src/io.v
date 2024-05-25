@@ -14,7 +14,7 @@ module io(
     output SwitchCtrl // Switch Chip Select
 );
     assign addr=addr_in;
-    assign r_data=(ioRead==1)?{0,bdata}:Mdata;
+    assign r_data=(ioRead==1)?{16b'0000000000000000,bdata}:Mdata;
     assign LEDCtrl= (ioWrite == 1'b1)?1'b1:1'b0; // led 模块的片选信号，高电平有效; 
     assign SwitchCtrl= (ioRead == 1'b1)?1'b1:1'b0; //switch 模块的片选信号，高电平有效;
     always@* begin
