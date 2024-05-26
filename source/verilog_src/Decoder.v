@@ -1,7 +1,6 @@
 module Decoder(
     input clk,
     input rst,
-    input regWrite,
     input [31:0] inst,
     
     input [31:0] ReadData,//来自ram或者io
@@ -13,7 +12,7 @@ module Decoder(
     output [31:0] rs2Data,
     output reg [31:0] imm32
 );
-     reg [31:0] writeData,
+     reg [31:0] writeData;
     reg [31:0] registers [0:31]; // 32个32位寄存器
     wire [4:0] rs1, rs2, rd;
     wire [6:0] opcode;
@@ -48,7 +47,7 @@ end
             for (i = 0; i < 32; i = i + 1) begin
                 registers[i] <= 32'b0;
             end
-        end else if (regWrite) begin
+        end else if (RegWrite) begin
             if (rd != 0) begin // 确保不会写入寄存器0
                 registers[rd] <= writeData;
             end

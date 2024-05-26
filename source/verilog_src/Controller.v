@@ -7,14 +7,14 @@ module Controller(
     output reg MemorIOtoReg,
     output reg MemRead,//memread
     output reg MemWrite,//memwrite
-    output reg IoRead;
-    output reg IoWrite;
+    output reg IoRead,
+    output reg IoWrite,
     output reg RegWrite,
 
     output reg [1:0] ALUOp,
     output reg Jump,
     output reg [2:0] BranchType,
-    output reg sft
+    //output reg sft
 
 );
 
