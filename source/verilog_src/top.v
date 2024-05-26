@@ -27,6 +27,8 @@ module cpu_top(
     wire MemtoReg;
     wire MemWrite;
     wire RegWrite;
+    wire ioRead;
+    wire ioWrite;
     wire Jump;
     wire zero;
     wire [2:0] BranchType;
@@ -69,21 +71,35 @@ wire[4:0] wr;//目标寄存器的编号
     );
 
     Decoder decoder(
-       
+        .clk(clock),
+        .rst(rst),
+        .regWrite(RegWrite),
+        .inst(inst),
+        .writeData(ReadData),//不确定
+        .rs1Data(ReadData1),
+        .rs2Data(ReadData2),
+        .imm32(imm32),
     );
 
 
     Controller controller(
         .inst(inst),
+        .ALUResult(ALUResult),
         .Branch(Branch),
-        .MemRead(MemRead),
-        .MemtoReg(MemtoReg),
-        .MemWrite(MemWrite),
         .ALUSrc(ALUSrc),
+
+        .MemorIOtoReg(MemtoReg),
+        .MemRead(MemRead),
+        .MemWrite(MemWrite),
+        .IoRead(ioRead),
+        .IoWrite(ioWrite),
         .RegWrite(RegWrite),
+
+
         .ALUOp(ALUOp),
         .Jump(Jump),
-        .BranchType(BranchType)
+        .BranchType(BranchType),
+        
     );
     ALU alu(
         .ReadData1(ReadData1),
@@ -124,8 +140,8 @@ wire[4:0] wr;//目标寄存器的编号
      io sys_io(
         .mRead(MemRead),
         .mWrite(MemWrite),
-        .ioRead(MemtoReg),
-        .ioWrite(RegWrite),
+        .ioRead(ioRead),
+        .ioWrite(ioWrite),
         .addr_in(ALUResult),
         .Mdata(ram_data),
         .Rdata(ReadData1),
