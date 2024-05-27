@@ -1,0 +1,2 @@
+programrom.v,verilog,xil_defaultlib,../../../../Debug.srcs/sources_1/ip/programrom/sim/programrom.v,
+glbl.v,Verilog,xil_defaultlib,glbl.v
