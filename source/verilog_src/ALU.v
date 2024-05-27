@@ -9,6 +9,7 @@ module ALU(
     //input lw,
     //input sw,
     input Jump,
+    input lui,
     input ALUSrc,
     output reg [31:0] ALUResult,
     output reg zero,
@@ -21,12 +22,18 @@ module ALU(
     always @(*) begin
         zero = 0;
         less = 0;
-        if (Jump) begin
+        if (Jump&&lui!=1'b0) begin
             ALUResult = (ReadData1 + operand2) & ~1;
-        end else begin
+        end 
+        else if (lui==1'b1) begin
+            operand2 = {imm32[19:0], 12'b0};
+            ALUResult = operand2;
+        end
+    
+        else begin
             case (ALUOp)
                 2'b00: begin
-                    // I-type instructions
+                    // I-type instructions or load and store instructions
                     case (funct3)
                         3'b000: ALUResult = ReadData1 + operand2; // addi
                         3'b111: ALUResult = ReadData1 & operand2; // andi

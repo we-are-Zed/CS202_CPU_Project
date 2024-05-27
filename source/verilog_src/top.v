@@ -30,6 +30,7 @@ module cpu_top(
     wire ioRead;
     wire ioWrite;
     wire Jump;
+    wire lui;
     wire zero;
     wire [2:0] BranchType;
     wire less;
@@ -101,6 +102,7 @@ wire[4:0] wr;//目标寄存器的编号
 
         .ALUOp(ALUOp),
         .Jump(Jump),
+        .lui(lui),
         .BranchType(BranchType),
         
     );
@@ -113,6 +115,7 @@ wire[4:0] wr;//目标寄存器的编号
         .funct7(funct7),
         .BranchType(BranchType),
         .Jump(Jump),
+        .lui(lui),
         .ALUSrc(ALUSrc),
         .ALUResult(ALUResult),
         .zero(zero),
