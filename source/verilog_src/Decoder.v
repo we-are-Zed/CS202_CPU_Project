@@ -72,6 +72,7 @@ module Decoder(
             7'b0100011: begin // sw
                 imm32 = {{20{inst[31]}}, inst[31:25], inst[11:7]}; // 符号扩展
             end
+            
             default: begin
                 imm32 = 32'b0; // 其他情况默认
             end
