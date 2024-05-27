@@ -2,18 +2,15 @@ module Decoder(
     input clk,
     input rst,
     input regWrite,
+    input MemRead,
+    input IoRead,
     input [31:0] inst,
-    
-    input [31:0] ReadData,//来自ram或者io
-    input [31:0] ALUresult,//来自alu
-    input RegWrite,
-    input MemtoReg,
- 
+    input [31:0] writeData,//
+    input [31:0] ALUResult,
     output [31:0] rs1Data,
     output [31:0] rs2Data,
     output reg [31:0] imm32
 );
-     reg [31:0] writeData,
     reg [31:0] registers [0:31]; // 32个32位寄存器
     wire [4:0] rs1, rs2, rd;
     wire [6:0] opcode;
@@ -27,19 +24,23 @@ module Decoder(
     assign opcode = inst[6:0];
     assign funct3 = inst[14:12];
 
-    // 读取寄存器数据
-    assign rs1Data = registers[rs1];
-    assign rs2Data = registers[rs2];
+    initial begin
+        for (i = 0; i < 32; i = i + 1) begin
+            registers[i] = 32'b0;
+        end
+        registers[31]=32'hFFFFFC50;
+    end
 
-always @(*) begin
-    if (RegWrite) begin
-        if (MemtoReg) begin
-            writeData = ReadData;
+    always @(*) begin
+        if(!rst) begin
+            rs1Data = 32'b0;
+            rs2Data = 32'b0;
         end else begin
-            writeData = ALUresult;
+            rs1Data = registers[rs1];
+            rs2Data = registers[rs2];
         end
     end
-end
+
 
 
     // 在时钟上升沿写入寄存器
@@ -48,9 +49,12 @@ end
             for (i = 0; i < 32; i = i + 1) begin
                 registers[i] <= 32'b0;
             end
-        end else if (regWrite) begin
-            if (rd != 0) begin // 确保不会写入寄存器0
+            registers[31]<=32'hFFFFFC50;
+        end else if (regWrite&&rd!=0) begin
+            if(MemRead||IoRead) begin
                 registers[rd] <= writeData;
+            end else begin
+                registers[rd] <= ALUResult;
             end
         end
     end

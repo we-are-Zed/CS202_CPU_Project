@@ -14,6 +14,7 @@ module cpu_top(
 
     wire [31:0] pc;
     reg [31:0] NextPC;
+    wire [31:0] next_pc_wire;
     wire [31:0] inst;
     wire [1:0] ALUOp;
     wire [31:0] ReadData1, ReadData2, imm32;
@@ -26,10 +27,13 @@ module cpu_top(
     wire MemtoReg;
     wire MemWrite;
     wire RegWrite;
+    wire ioRead;
+    wire ioWrite;
     wire Jump;
     wire zero;
     wire [2:0] BranchType;
     wire less;
+    wire [31:0] ReadData;
     wire [31:0] WriteData;
     wire [31:0] ram_data;
 
@@ -40,6 +44,7 @@ wire[4:0] wr;//目标寄存器的编号
 
     assign funct3 = inst[14:12];
     assign funct7 = inst[31:25];
+    assign next_pc_wire = NextPC;
 
     
     //wire先不删，可能会用到
@@ -57,35 +62,47 @@ wire[4:0] wr;//目标寄存器的编号
     IFetch ifetch(
         .clk(clock),
         .rst(rst),
-        .imm32(imm32),
-        .branch(Branch),
-        .zero(zero),
+        //.imm32(imm32),
+        //.branch(Branch),
+        //.zero(zero),
+        .NextPC(next_pc_wire),
+        .pc(pc),
         .inst(inst)
     );
 
     Decoder decoder(
-        .clk(clock),
+        .clk(clock)
         .rst(rst),
         .regWrite(RegWrite),
+        .MemRead(MemRead),
+        .IoRead(ioRead),
         .inst(inst),
         .writeData(WriteData),
+        .ALUResult(ALUResult),
         .rs1Data(ReadData1),
         .rs2Data(ReadData2),
-        .imm32(imm32)
+        .imm32(imm32),
     );
 
 
     Controller controller(
         .inst(inst),
+        .ALUResult(ALUResult),
         .Branch(Branch),
-        .MemRead(MemRead),
-        .MemtoReg(MemtoReg),
-        .MemWrite(MemWrite),
         .ALUSrc(ALUSrc),
+
+        .MemorIOtoReg(MemtoReg),
+        .MemRead(MemRead),
+        .MemWrite(MemWrite),
+        .IoRead(ioRead),
+        .IoWrite(ioWrite),
         .RegWrite(RegWrite),
+
+
         .ALUOp(ALUOp),
         .Jump(Jump),
-        .BranchType(BranchType)
+        .BranchType(BranchType),
+        
     );
     ALU alu(
         .ReadData1(ReadData1),
@@ -126,8 +143,8 @@ wire[4:0] wr;//目标寄存器的编号
      io sys_io(
         .mRead(MemRead),
         .mWrite(MemWrite),
-        .ioRead(MemtoReg),
-        .ioWrite(RegWrite),
+        .ioRead(ioRead),
+        .ioWrite(ioWrite),
         .addr_in(ALUResult),
         .Mdata(ram_data),
         .Rdata(ReadData1),
