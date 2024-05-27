@@ -5,11 +5,10 @@ module IFetch(
     //input branch,
     //input zero,
     input [31:0] NextPC,
-    output reg [31:0] pc
+    output reg [31:0] pc,
     output [31:0] inst
 );
 
-    reg [31:0] pc;
     wire [31:0] instruction;
     wire [13:0] addra;
 

@@ -72,7 +72,7 @@ wire[4:0] wr;//目标寄存器的编号
     );
 
     Decoder decoder(
-        .clk(clock)
+        .clk(clock),
         .rst(rst),
         .regWrite(RegWrite),
         .MemRead(MemRead),
@@ -82,7 +82,7 @@ wire[4:0] wr;//目标寄存器的编号
         .ALUResult(ALUResult),
         .rs1Data(ReadData1),
         .rs2Data(ReadData2),
-        .imm32(imm32),
+        .imm32(imm32)
     );
 
 
@@ -103,7 +103,7 @@ wire[4:0] wr;//目标寄存器的编号
         .ALUOp(ALUOp),
         .Jump(Jump),
         .lui(lui),
-        .BranchType(BranchType),
+        .BranchType(BranchType)
         
     );
     ALU alu(
