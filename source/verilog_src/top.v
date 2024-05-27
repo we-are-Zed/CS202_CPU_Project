@@ -71,11 +71,14 @@ wire[4:0] wr;//目标寄存器的编号
     );
 
     Decoder decoder(
-        .clk(clock),
+        .clk(clock)
         .rst(rst),
         .regWrite(RegWrite),
+        .MemRead(MemRead),
+        .IoRead(ioRead),
         .inst(inst),
-        .writeData(ReadData),//不确定
+        .writeData(WriteData),
+        .ALUResult(ALUResult),
         .rs1Data(ReadData1),
         .rs2Data(ReadData2),
         .imm32(imm32),
