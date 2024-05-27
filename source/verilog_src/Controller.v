@@ -1,20 +1,20 @@
 module Controller(
     input [31:0] inst,
     input [31:0] ALUResult,
-    output reg Branch,
-    output reg ALUSrc,//
+    output  Branch,
+    output  ALUSrc,//
 
-    output reg MemorIOtoReg,
-    output reg MemRead,//memread
-    output reg MemWrite,//memwrite
-    output reg IoRead,
-    output reg IoWrite,
-    output reg RegWrite,
+    output  MemorIOtoReg,
+    output  MemRead,//memread
+    output  MemWrite,//memwrite
+    output  IoRead,
+    output  IoWrite,
+    output  RegWrite,
 
     output reg [1:0] ALUOp,
-    output reg Jump,
-    output reg lui,
-    output reg [2:0] BranchType,
+    output Jump,
+    output lui,
+    output [2:0] BranchType
     //output reg sft
 
 );
@@ -41,12 +41,14 @@ module Controller(
     wire lw;
     wire sw;
     wire lui;
+    wire jal;
     assign R_type = (opcode == R_TYPE)? 1'b1 : 1'b0;
     assign I_type = (opcode == I_TYPE)? 1'b1 : 1'b0;
-    assign lw = (opcode == LOAD&&funct3==3'b002)? 1'b1 : 1'b0;
-    assign sw = (opcode == STORE&&funct3==3'b002)? 1'b1 : 1'b0;
+    assign lw = (opcode == LOAD&&funct3==3'b010)? 1'b1 : 1'b0;
+    assign sw = (opcode == STORE&&funct3==3'b010)? 1'b1 : 1'b0;
     assign Jump = (opcode == JALR||opcode==JAL)? 1'b1 : 1'b0;
     assign jrn = (opcode == JALR)? 1'b1 : 1'b0;
+    assign jal= (opcode == JAL)? 1'b1 : 1'b0;
     assign ALUSrc = (I_type||lw||sw||jrn||lui)? 1'b1 : 1'b0;
     assign RegWrite = (R_type||I_type||lw||jal||lui)&&!jrn? 1'b1 : 1'b0;
     assign Branch = (opcode == BRANCH)? 1'b1 : 1'b0;
