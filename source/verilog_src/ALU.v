@@ -16,18 +16,17 @@ module ALU(
     output reg less
 );
 
-    wire [31:0] operand2;
-    assign operand2 = (ALUSrc) ? imm32 : ReadData2;
-
+    reg [31:0] operand2;
+    
     always @(*) begin
+    operand2 = (ALUSrc) ? imm32 : ReadData2;
         zero = 0;
         less = 0;
-        if (Jump&&lui!=1'b0) begin
+        if (Jump&&lui!=1'b1) begin
             ALUResult = (ReadData1 + operand2) & ~1;
         end 
         else if (lui==1'b1) begin
-            operand2 = {imm32[19:0], 12'b0};
-            ALUResult = operand2;
+            ALUResult = {imm32[19:0], 12'b0};
         end
     
         else begin
