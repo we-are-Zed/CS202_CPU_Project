@@ -27,7 +27,7 @@ module Decoder(
         for (i = 0; i < 32; i = i + 1) begin
             registers[i] = 32'b0;
         end
-        registers[31]=32'h1000FC00;
+        registers[31]=32'hFFFFFC00;
     end
 
     always @(*) begin
@@ -47,7 +47,7 @@ module Decoder(
             for (i = 0; i < 32; i = i + 1) begin
                 registers[i] <= 32'b0;
             end
-            registers[31]<=32'h1000FC00;
+            registers[31]<=32'hFFFFFC00;
         end else if (regWrite&&rd!=0) begin
             if(MemRead||IoRead) begin
                 registers[rd] <= writeData;
