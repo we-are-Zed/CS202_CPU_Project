@@ -4,7 +4,7 @@ module cpu_top(
     input rst,//复位信号，低电平有效
     input [23:0] button_in,
     output wire [23:0] led_out,
-    output [7:0] seg_out
+    output [31:0] seg_out
 );
 
    wire clock;
