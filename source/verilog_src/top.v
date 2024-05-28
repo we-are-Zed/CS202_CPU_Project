@@ -5,6 +5,9 @@ module cpu_top(
     input [23:0] button_in,
     output wire [23:0] led_out,
     output [31:0] seg_out
+    output[11:0]rgb,
+    output v_vs,
+    output v_hs
 );
 
    wire clock;
@@ -195,6 +198,24 @@ wire[4:0] wr;//目标寄存器的编号
     .ledaddr(2'b00),//直接取末16位
     .ledwdata(WriteData[15:0]),
     .ledout(led_out)
+    );
+    wire [35:0]vga_data
+    vga_ctrl vctrl (
+        .clk(clock),
+        .rst(rst),
+        .vga_ctrl(vledctrl_c),
+        .data_in(button_in[2:0]),
+
+        .data(vga_data)
+    );
+
+    VGA vga (
+        .clk(clock),
+        .rst(rst),
+        .vc_data(vga_data),
+        .rgb(rgb),
+        .vs(v_vs),
+        .hs(v_hs)
     );
     // 跳转j类型或分支类型的PC更新逻辑
     //没想好PC的更新逻辑放在这里妥不妥
