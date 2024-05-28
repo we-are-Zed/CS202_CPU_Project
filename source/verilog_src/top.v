@@ -2,7 +2,8 @@
 module cpu_top(
     input clk,
     input rst,//复位信号，低电平有效
-    input [23:0] button_in,
+    input check,
+    input [16:0] button_in,
     output wire [23:0] led_out,
     output [31:0] seg_out
     output[11:0]rgb,
@@ -154,7 +155,7 @@ wire[4:0] wr;//目标寄存器的编号
         .addr_in(ALUResult),
         .Mdata(ram_data),
         .Rdata(ReadData1),
-        .bdata(ioread_data),//data from button(io)
+        .bdata(button_out),//data from button(io)
         .addr(ALUResult),
         .r_data(ReadData2),
         .w_data(WriteData),
