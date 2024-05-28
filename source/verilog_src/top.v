@@ -203,7 +203,7 @@ wire[4:0] wr;//目标寄存器的编号
     vga_ctrl vctrl (
         .clk(clock),
         .rst(rst),
-        .vga_ctrl(ledctrl),
+        .vga_ctrl(ledctrld),
         .data_in(button_in[2:0]),
 
         .data(vga_data)
