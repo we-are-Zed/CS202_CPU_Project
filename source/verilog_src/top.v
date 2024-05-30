@@ -221,6 +221,9 @@ wire[4:0] wr;//目标寄存器的编号
     // 跳转j类型或分支类型的PC更新逻辑
     //没想好PC的更新逻辑放在这里妥不妥
     always @(*) begin
+        if (!rst) begin
+            NextPC = 32'h00000000;
+        end else
         if (Branch) begin
             case (BranchType)
                3'b000: NextPC = zero ? (pc + (imm32 << 1)) : (pc + 4); // beq

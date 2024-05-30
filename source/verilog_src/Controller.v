@@ -13,7 +13,9 @@ module Controller(
 
     output reg [1:0] ALUOp,
     output Jump,
+    output jrn,
     output lui,
+    output auipc,
     output [2:0] BranchType
     //output reg sft
 
@@ -33,11 +35,10 @@ module Controller(
     localparam [6:0] JALR = 7'b1100111;
     localparam [6:0] JAL = 7'b1101111;
     localparam [6:0] LUI = 7'b0110111;
-    //localparam [6:0] AUIPC = 7'b0010111;
+    localparam [6:0] AUIPC = 7'b0010111;
 
     wire R_type;
     wire I_type;
-    wire jrn;
     wire lw;
     wire sw;
     //wire lui;
@@ -49,9 +50,8 @@ module Controller(
     assign Jump = (opcode == JALR||opcode==JAL)? 1'b1 : 1'b0;
     assign jrn = (opcode == JALR)? 1'b1 : 1'b0;
     assign jal= (opcode == JAL)? 1'b1 : 1'b0;
-    assign ALUSrc = (I_type||lw||sw||jrn||lui)? 1'b1 : 1'b0;
-    assign RegWrite = (R_type||I_type||lw||jal||lui)&&!jrn? 1'b1 : 1'b0;
-    assign RegWrite = (R_type||I_type||lw||jal||lui)&&!jrn? 1'b1 : 1'b0;
+    assign ALUSrc = (I_type||lw||sw||jrn||lui||auipc)? 1'b1 : 1'b0;
+    assign RegWrite = (R_type||I_type||lw||jal||lui||auipc||jrn)? 1'b1 : 1'b0;
     assign Branch = (opcode == BRANCH)? 1'b1 : 1'b0;
     assign MemRead = (lw==1'b1&&(ALUResult[21:0]!=22'b1111111111111111111111))? 1'b1 : 1'b0;
     assign MemWrite = (sw==1'b1&&(ALUResult[21:0]!=22'b1111111111111111111111))? 1'b1 : 1'b0;
@@ -62,6 +62,7 @@ module Controller(
     assign BranchType =(Branch)? inst[14:12] : 3'b000;
 
     assign lui = (opcode == LUI)? 1'b1 : 1'b0;
+    assign auipc =(opcode == AUIPC)? 1'b1 : 1'b0;
 
     always @(*) begin
         case(opcode)
@@ -80,6 +81,9 @@ module Controller(
         end
         BRANCH: begin
             ALUOp = 2'b01;
+        end
+        AUIPC:begin
+            ALUOp=2'b11;
         end
         default: begin
             ALUOp = 2'b00;

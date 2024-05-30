@@ -9,7 +9,10 @@ module ALU(
     //input lw,
     //input sw,
     input Jump,
+    input jalr,
+    input [31:0] pc_reg,
     input lui,
+    input auipc,
     input ALUSrc,
     output reg [31:0] ALUResult,
     output reg zero,
@@ -24,12 +27,19 @@ module ALU(
         zero = 1'b0;
         less = 1'b0;
         if (Jump&&lui!=1'b1) begin
+            if(jalr ==1'b1) begin
+                ALUResult = pc_reg + 4;
+            end
+            else begin
             ALUResult = (ReadData1 + operand2) & ~1;
-            
+            end
         end 
         else if (lui==1'b1) begin
-            ALUResult = {imm32[19:0], 12'b0};
+            ALUResult = imm32;
            
+        end
+        else if(auipc==1'b1)begin
+              ALUResult = pc_reg + imm32;
         end
     
         else begin
@@ -60,6 +70,7 @@ module ALU(
                 2'b10: begin
                     // R-type instructions
                     case ({funct7, funct3})
+                    
                         10'b0000000_000: ALUResult = ReadData1 + operand2; // add
                         10'b0100000_000: ALUResult = ReadData1 - operand2; // sub
                          10'b0000000_111: ALUResult = ReadData1 & operand2; // and
@@ -81,10 +92,10 @@ module ALU(
     always @(*) begin
             zero = (ALUResult == 32'b0);
             case (BranchType)
-                3'b000: less = ($signed(ReadData1) < $signed(ReadData2)); // blt
-                3'b001: less = ($signed(ReadData1) >= $signed(ReadData2)); // bge
-                3'b100: less = (ReadData1 < ReadData2); // bltu
-                3'b101: less = (ReadData1 >= ReadData2); // bgeu
+                3'b100: less = ($signed(ReadData1) < $signed(ReadData2)); // blt
+                3'b101: less = ($signed(ReadData1) < $signed(ReadData2)); // bge
+                3'b110: less = (ReadData1 < ReadData2); // bltu
+                3'b111: less = (ReadData1 < ReadData2); // bgeu
                 default: less = 1'b0;
             endcase
         end
