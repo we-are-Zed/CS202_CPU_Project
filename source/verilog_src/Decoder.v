@@ -5,7 +5,7 @@ module Decoder(
     input MemRead,
     input IoRead,
     input [31:0] inst,
-    input [31:0] writeData,//
+    input [31:0] writeData,
     input [31:0] ALUResult,
     output reg [31:0] rs1Data,
     output reg [31:0] rs2Data,
@@ -24,7 +24,7 @@ module Decoder(
     assign funct3 = inst[14:12];
 
     initial begin
-        for (i = 0; i < 32; i = i + 1) begin
+        for (i = 0; i < 31; i = i + 1) begin
             registers[i] = 32'b0;
         end
         registers[31]=32'hFFFFFC00;
@@ -44,7 +44,7 @@ module Decoder(
 
     always @(posedge clk or negedge rst) begin
         if (!rst) begin
-            for (i = 0; i < 32; i = i + 1) begin
+            for (i = 0; i < 31; i = i + 1) begin
                 registers[i] <= 32'b0;
             end
             registers[31]<=32'hFFFFFC00;
@@ -57,15 +57,14 @@ module Decoder(
         end
     end
 
-    // 鐢熸垚绔嬪嵆鏁�
     always @(*) begin
         case (opcode)
             7'b1100011: begin // beq
-                imm32 = {{20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0}; 
+                imm32 = {{20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0};
             end
             7'b0000011, // lw
             7'b0010011: begin // I-type (addi, andi, ori)
-                imm32 = {{20{inst[31]}}, inst[31:20]}; 
+                imm32 = {{20{inst[31]}}, inst[31:20]};
             end
             7'b0100011: begin // sw
                 imm32 = {{20{inst[31]}}, inst[31:25], inst[11:7]}; 

@@ -20,13 +20,16 @@ module ALU(
     
     always @(*) begin
     operand2 = (ALUSrc) ? imm32 : ReadData2;
-        zero = 0;
-        less = 0;
+        ALUResult =32'b0;
+        zero = 1'b0;
+        less = 1'b0;
         if (Jump&&lui!=1'b1) begin
             ALUResult = (ReadData1 + operand2) & ~1;
+            
         end 
         else if (lui==1'b1) begin
             ALUResult = {imm32[19:0], 12'b0};
+           
         end
     
         else begin
@@ -52,32 +55,7 @@ module ALU(
                     endcase
                 end
                 2'b01: begin
-                    case (BranchType)
-                        3'b000: begin // beq
-                            ALUResult = ReadData1 - operand2;
-                            zero = (ALUResult == 32'b0);
-                        end
-                        3'b001: begin // bne
-                            ALUResult = ReadData1 - operand2;
-                            zero = (ALUResult != 32'b0);
-                        end
-                        3'b100: begin // blt
-                            less = ($signed(ReadData1) < $signed(operand2));
-                        end
-                        3'b101: begin // bge
-                            less = ($signed(ReadData1) >= $signed(operand2));
-                        end
-                        3'b110: begin // bltu
-                            less = (ReadData1 < operand2);
-                        end
-                        3'b111: begin // bgeu
-                            less = (ReadData1 >= operand2);
-                        end
-                        default: begin
-                            zero = 1'b0;
-                            less = 1'b0;
-                        end
-                    endcase
+                    ALUResult = ReadData1 - operand2;
                 end
                 2'b10: begin
                     // R-type instructions
@@ -99,4 +77,17 @@ module ALU(
             endcase
         end
     end
+    
+    always @(*) begin
+            zero = (ALUResult == 32'b0);
+            case (BranchType)
+                3'b000: less = ($signed(ReadData1) < $signed(ReadData2)); // blt
+                3'b001: less = ($signed(ReadData1) >= $signed(ReadData2)); // bge
+                3'b100: less = (ReadData1 < ReadData2); // bltu
+                3'b101: less = (ReadData1 >= ReadData2); // bgeu
+                default: less = 1'b0;
+            endcase
+        end
+    
+    
 endmodule
