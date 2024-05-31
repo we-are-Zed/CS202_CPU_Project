@@ -14,6 +14,7 @@ module ALU(
     input lui,
     input auipc,
     input ALUSrc,
+    input lb,
     output reg [31:0] ALUResult,
     output reg zero,
     output reg less
@@ -40,6 +41,10 @@ module ALU(
         end
         else if(auipc==1'b1)begin
               ALUResult = pc_reg + imm32;
+        end
+        else if(lb==1'b1)begin
+             
+            ALUResult = ReadData1 + operand2;
         end
     
         else begin

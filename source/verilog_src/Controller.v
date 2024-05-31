@@ -16,7 +16,8 @@ module Controller(
     output jrn,
     output lui,
     output auipc,
-    output [2:0] BranchType
+    output [2:0] BranchType,
+    output lb
     //output reg sft
 
 );
@@ -39,6 +40,7 @@ module Controller(
 
     wire R_type;
     wire I_type;
+    wire lbu;
     wire lw;
     wire sw;
     //wire lui;
@@ -46,17 +48,19 @@ module Controller(
     assign R_type = (opcode == R_TYPE)? 1'b1 : 1'b0;
     assign I_type = (opcode == I_TYPE)? 1'b1 : 1'b0;
     assign lw = (opcode == LOAD&&funct3==3'b010)? 1'b1 : 1'b0;
+    assign lb = (opcode == LOAD&&funct3==3'b000)? 1'b1 : 1'b0;
+    assign lbu = (opcode == LOAD&&funct3==3'b100)? 1'b1 : 1'b0;
     assign sw = (opcode == STORE&&funct3==3'b010)? 1'b1 : 1'b0;
     assign Jump = (opcode == JALR||opcode==JAL)? 1'b1 : 1'b0;
     assign jrn = (opcode == JALR)? 1'b1 : 1'b0;
     assign jal= (opcode == JAL)? 1'b1 : 1'b0;
-    assign ALUSrc = (I_type||lw||sw||jrn||lui||auipc)? 1'b1 : 1'b0;
-    assign RegWrite = (R_type||I_type||lw||jal||lui||auipc||jrn)? 1'b1 : 1'b0;
+    assign ALUSrc = (I_type||lw||sw||jrn||lui||auipc||lb||lbu)? 1'b1 : 1'b0;
+    assign RegWrite = (R_type||I_type||lw||jal||lui||auipc||jrn||lb||lbu)? 1'b1 : 1'b0;
     assign Branch = (opcode == BRANCH)? 1'b1 : 1'b0;
-    assign MemRead = (lw==1'b1&&(ALUResult[21:0]!=22'b1111111111111111111111))? 1'b1 : 1'b0;
-    assign MemWrite = (sw==1'b1&&(ALUResult[21:0]!=22'b1111111111111111111111))? 1'b1 : 1'b0;
-    assign IoRead = (lw==1'b1&&(ALUResult[21:0]==22'b1111111111111111111111))? 1'b1 : 1'b0;
-    assign IoWrite = (sw==1'b1&&(ALUResult[21:0]==22'b1111111111111111111111))? 1'b1 : 1'b0;
+    assign MemRead = ((lw==1'b1||lb==1'b1||lbu==1'b1)&&(ALUResult[31:10]!=22'b1111111111111111111111))? 1'b1 : 1'b0;
+    assign MemWrite = (sw==1'b1&&(ALUResult[31:10]!=22'b1111111111111111111111))? 1'b1 : 1'b0;
+    assign IoRead = ((lw==1'b1||lb==1'b1||lbu==1'b1)&&(ALUResult[31:10]==22'b1111111111111111111111))? 1'b1 : 1'b0;
+    assign IoWrite = (sw==1'b1&&(ALUResult[31:10]==22'b1111111111111111111111))? 1'b1 : 1'b0;
     assign MemorIOtoReg = (MemRead||IoRead)? 1'b1 : 1'b0;
     //assign sft =(I_type&&(funct3==3'b101||funct3==3'b001))? 1'b1 : 1'b0;
     assign BranchType =(Branch)? inst[14:12] : 3'b000;

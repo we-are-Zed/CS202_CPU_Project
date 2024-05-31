@@ -1,6 +1,7 @@
 module Decoder(
     input clk,
     input rst,
+    input lb,
     input regWrite,
     input MemRead,
     input IoRead,
@@ -12,6 +13,7 @@ module Decoder(
     output reg [31:0] imm32
 );
     reg [31:0] registers [0:31]; 
+
     wire [4:0] rs1, rs2, rd;
     wire [6:0] opcode;
     wire [2:0] funct3;
@@ -42,6 +44,20 @@ module Decoder(
 
 
 
+     always @(*) begin
+        if(lb==1'b1) begin
+        if(funct3==3'b000) begin
+            writeData = {24{writeData[7]},writeData[7:0]}
+        end else begin
+            writeData = {{24{1'b0}}, writeData[7:0]};
+        end
+    end
+    end
+     
+    
+
+
+
     always @(posedge clk or negedge rst) begin
         if (!rst) begin
             for (i = 0; i < 31; i = i + 1) begin
@@ -63,7 +79,7 @@ module Decoder(
             7'b1100011: begin // beq, bne, blt, bge, bltu, bgeu
                 imm32 = {{20{inst[31]}}, inst[7], inst[30:25], inst[11:8], 1'b0};
             end
-             7'b0000011, // lw
+             7'b0000011, // lw,lb,lbu
              7'b0010011, // I-type (addi, andi, ori)
              7'b1100111: begin // jalr
                            imm32 = {{20{inst[31]}}, inst[31:20]};

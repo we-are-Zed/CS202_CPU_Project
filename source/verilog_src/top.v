@@ -1,20 +1,21 @@
 module cpu_top(
     input clk,
     input rst,
-    input check,
+    input check_ww,
     input [15:0] button_in,
     output wire [23:0] led_out,
-    output [7:0] seg_out,
-    output ioRead,
-    output [31:0] ALUResult,
-    output [31:0] inst,
-    output [31:0] pc,
-    output [31:0] pc_reg,
-    output [1:0] ALUOp,
-    output [2:0] funct3,
-    output [31:0] imm32,
-    output clock
+    output [7:0] seg_out
 );
+ 
+ wire ioRead;
+ wire [31:0] ALUResult;
+ wire [31:0] inst;
+ wire [31:0] pc;
+ wire [31:0] pc_reg;
+ wire [1:0] ALUOp;
+ wire [2:0] funct;
+ wire [31:0] imm32;
+ wire clock;
    //wire alu_tb;
    //assign ALUResult=alu_tb;
    //wire clock;
@@ -41,6 +42,8 @@ module cpu_top(
     //wire ioRead;
     wire ioWrite;
     wire Jump;
+    wire lb;
+
     wire lui;
     wire auipc;
     wire jalr;
@@ -52,17 +55,23 @@ module cpu_top(
     wire [31:0] ram_data;
     wire[31:0]r_data;
     wire [31:0]address_io;
-wire[4:0] wr;//鐩爣瀵勫瓨鍣ㄧ殑缂栧彿
-    wire[4:0] rs1;//婧愬瘎瀛樺櫒鐨勭紪鍙 
-    wire[4:0] rs2;//绗簩涓簮瀵勫瓨鍣ㄧ殑缂栧彿
+wire[4:0] wr;//閻╊喗鐖ｇ?靛嫬鐡ㄩ崳銊ф畱缂傛牕褰?
+    wire[4:0] rs1;//濠ф劕鐦庣?涙ê娅掗惃鍕椽閸? 
+    wire[4:0] rs2;//缁楊兛绨╂稉顏呯爱鐎靛嫬鐡ㄩ崳銊ф畱缂傛牕褰?
 
 
     assign funct3 = inst[14:12];
     assign funct7 = inst[31:25];
     assign next_pc_wire = NextPC;
+    
+        keyDeb ck (
+            .clk(clk),
+            .rst(rst),
+            .key_i(check_ww),
+            .key_o(check)
+        );
 
-
-    clk_wiz_0 cpuclk(
+    cpuclk cpuclk(
     .clk_in1(clk),
     .clk_out1(clock),
         .clk_out2(uart_clk)
@@ -87,6 +96,7 @@ wire[4:0] wr;//鐩爣瀵勫瓨鍣ㄧ殑缂栧彿
     Decoder decoder(
         .clk(clock),
         .rst(rst),
+        .lb(lb),
         .regWrite(RegWrite),
         .MemRead(MemRead),
         .IoRead(ioRead),
@@ -119,7 +129,8 @@ wire[4:0] wr;//鐩爣瀵勫瓨鍣ㄧ殑缂栧彿
         
         .lui(lui),
         .auipc(auipc),
-        .BranchType(BranchType)
+        .BranchType(BranchType),
+        .lb(lb)
         
     );
     ALU alu(
@@ -136,6 +147,7 @@ wire[4:0] wr;//鐩爣瀵勫瓨鍣ㄧ殑缂栧彿
         .lui(lui),
         .auipc(auipc),
         .ALUSrc(ALUSrc),
+        .lb(lb),
         .ALUResult(ALUResult),
         .zero(zero),
         .less(less)
@@ -148,21 +160,23 @@ wire[4:0] wr;//鐩爣瀵勫瓨鍣ㄧ殑缂栧彿
         .ram_dat_i(ReadData2),
         .ram_dat_o(ram_data),
         
-        // UART杩欓儴鍒嗕紶鍏ョ殑鏁版嵁鎴戜笉纭畾
+        // UART鏉╂瑩鍎撮崚鍡曠炊閸忋儳娈戦弫鐗堝祦閹存垳绗夌涵顔肩暰
         .upg_rst_i(rst),
         .upg_clk_i(clock),
         .upg_wen_i(MemWrite),
         .upg_adr_i(ALUResult[15:2]),
         .upg_dat_i(ReadData2),
         .upg_done_i(1'b1),
-        .funct3(funct3)
+        //.funct3(funct3)
     );
 
     
      wire switchctrl;
      wire ledctrl;
      wire ioread_data;
-
+     wire LEDlowCtrl;
+     wire LEDmidCtrl;
+     wire LEDhighCtrl;
      io sys_io(
         .mRead(MemRead),
         .mWrite(MemWrite),
@@ -175,7 +189,9 @@ wire[4:0] wr;//鐩爣瀵勫瓨鍣ㄧ殑缂栧彿
         .addr(address_io),
         .r_data(r_data),
         .w_data(WriteData),
-        .LEDCtrl(ledctrl),
+        .LEDlowCtrl(LEDlowCtrl),
+        .LEDmidCtrl(LEDmidCtrl),
+        .LEDhighCtrl(LEDhighCtrl),
         .SwitchCtrl(switchctrl)
         );
   //  ioread ioread(
@@ -211,8 +227,10 @@ wire[4:0] wr;//鐩爣瀵勫瓨鍣ㄧ殑缂栧彿
     .led_clk(clock),
     .ledrst(rst),
     .ledwrite(RegWrite),
-    .ledcs(ledctrl),
-    .ledaddr(2'b00),//鐩存帴鍙栨湯16浣 
+    .ledlow(LEDlowCtrl),
+    .ledmid(LEDmidCtrl),
+    .ledhigh(LEDhighCtrl),
+ //   .ledaddr(2'b00),//閻╁瓨甯撮崣鏍ㄦ汞16娴? 
     .ledwdata(WriteData[15:0]),
     .ledout(led_out)
     );
@@ -228,5 +246,3 @@ wire[4:0] wr;//鐩爣瀵勫瓨鍣ㄧ殑缂栧彿
     wire [31:0] upg_dat_o;
 
 endmodule
-
-

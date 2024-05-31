@@ -10,7 +10,7 @@ module memory(
     input [13:0] upg_adr_i, 
     input [31:0] upg_dat_i, 
     input upg_done_i,
-    input [2:0] funct3 // 新增用于区分lb和lbu
+    //input [2:0] funct3 // 新增用于区分lb和lbu
 );
     wire ram_clk = !ram_clk_i;
     wire kickOff = upg_rst_i | (~upg_rst_i & upg_done_i);
@@ -25,14 +25,15 @@ module memory(
         .douta (mem_data)
     );
 
-    always @(*) begin
-        case (funct3)
-            3'b000: // lb
-                ram_dat_o = {{24{mem_data[7]}}, mem_data[7:0]};
-            3'b100: // lbu
-                ram_dat_o = {24'b0, mem_data[7:0]};
-            default: 
+
+   always @(*) begin
+     //   case (funct3)
+       //     3'b000: // lb
+         //       ram_dat_o = {{24{mem_data[7]}}, mem_data[7:0]};
+           // 3'b100: // lbu
+             //   ram_dat_o = {24'b0, mem_data[7:0]};
+            //default: 
                 ram_dat_o = mem_data;
-        endcase
+        //endcase
     end
 endmodule
