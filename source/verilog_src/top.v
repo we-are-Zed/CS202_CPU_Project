@@ -1,29 +1,36 @@
-`timescale 1ns / 1ps
 module cpu_top(
     input clk,
-    input rst,//复位信号，低电平有效
+    input rst,
     input check,
-    input [16:0] button_in,
+    input [15:0] button_in,
     output wire [23:0] led_out,
-    output [31:0] seg_out
-    output[11:0]rgb,
-    output v_vs,
-    output v_hs
+    output [7:0] seg_out,
+    output ioRead,
+    output [31:0] ALUResult,
+    output [31:0] inst,
+    output [31:0] pc,
+    output [31:0] pc_reg,
+    output [1:0] ALUOp,
+    output [2:0] funct3,
+    output [31:0] imm32,
+    output clock
 );
-
-   wire clock;
+   //wire alu_tb;
+   //assign ALUResult=alu_tb;
+   //wire clock;
     wire uart_clk;
    //wire [23:0] button_i;
    wire [15:0] button_out;
 
-    wire [31:0] pc;
+    //wire [31:0] pc;
     reg [31:0] NextPC;
     wire [31:0] next_pc_wire;
-    wire [31:0] inst;
-    wire [1:0] ALUOp;
-    wire [31:0] ReadData1, ReadData2, imm32;
-    wire [31:0] ALUResult;
-    wire [2:0] funct3;
+    //wire [31:0] inst;
+    //wire [1:0] ALUOp;
+    wire [31:0] ReadData1, ReadData2;
+   // wire imm32;
+    //wire [31:0] ALUResult;
+    //wire [2:0] funct3;
     wire [6:0] funct7;
     wire ALUSrc;
     wire Branch;
@@ -31,32 +38,29 @@ module cpu_top(
     wire MemtoReg;
     wire MemWrite;
     wire RegWrite;
-    wire ioRead;
+    //wire ioRead;
     wire ioWrite;
     wire Jump;
     wire lui;
+    wire auipc;
+    wire jalr;
     wire zero;
     wire [2:0] BranchType;
     wire less;
     wire [31:0] ReadData;
     wire [31:0] WriteData;
     wire [31:0] ram_data;
-
-wire[4:0] wr;//目标寄存器的编号
-    wire[4:0] rs1;//源寄存器的编号
-    wire[4:0] rs2;//第二个源寄存器的编号
+    wire[31:0]r_data;
+    wire [31:0]address_io;
+wire[4:0] wr;//鐩爣瀵勫瓨鍣ㄧ殑缂栧彿
+    wire[4:0] rs1;//婧愬瘎瀛樺櫒鐨勭紪鍙 
+    wire[4:0] rs2;//绗簩涓簮瀵勫瓨鍣ㄧ殑缂栧彿
 
 
     assign funct3 = inst[14:12];
     assign funct7 = inst[31:25];
     assign next_pc_wire = NextPC;
 
-    
-    //wire先不删，可能会用到
-    //首先实例化cpuclk
-    //再实例化if拿到数据
-    //这里可能还需要实例化registers(已经在decoder里面实例化了)
-    //然后实例化controller
 
     clk_wiz_0 cpuclk(
     .clk_in1(clk),
@@ -67,12 +71,17 @@ wire[4:0] wr;//目标寄存器的编号
     IFetch ifetch(
         .clk(clock),
         .rst(rst),
-        //.imm32(imm32),
-        //.branch(Branch),
-        //.zero(zero),
-        .NextPC(next_pc_wire),
+        .Jump(Jump),
+        .Jalr(jalr),
+        .Branch(Branch),
+        .zero(zero),
+        .less(less),
+        .BranchType(BranchType),
+        .imm32(imm32),
+        .rs1(ReadData1),
         .pc(pc),
-        .inst(inst)
+        .inst(inst),
+        .pc_reg(pc_reg)
     );
 
     Decoder decoder(
@@ -82,7 +91,7 @@ wire[4:0] wr;//目标寄存器的编号
         .MemRead(MemRead),
         .IoRead(ioRead),
         .inst(inst),
-        .writeData(WriteData),
+        .writeData(r_data),
         .ALUResult(ALUResult),
         .rs1Data(ReadData1),
         .rs2Data(ReadData2),
@@ -106,7 +115,10 @@ wire[4:0] wr;//目标寄存器的编号
 
         .ALUOp(ALUOp),
         .Jump(Jump),
+        .jrn(jalr),
+        
         .lui(lui),
+        .auipc(auipc),
         .BranchType(BranchType)
         
     );
@@ -119,7 +131,10 @@ wire[4:0] wr;//目标寄存器的编号
         .funct7(funct7),
         .BranchType(BranchType),
         .Jump(Jump),
+        .jalr(jalr),
+        .pc_reg(pc_reg),
         .lui(lui),
+        .auipc(auipc),
         .ALUSrc(ALUSrc),
         .ALUResult(ALUResult),
         .zero(zero),
@@ -129,11 +144,11 @@ wire[4:0] wr;//目标寄存器的编号
     memory mem(
         .ram_clk_i(clock),
         .ram_wen_i(MemWrite),
-        .ram_adr_i(ALUResult[15:2]),
+        .ram_adr_i(address_io),
         .ram_dat_i(ReadData2),
         .ram_dat_o(ram_data),
         
-        // UART这部分传入的数据我不确定
+        // UART杩欓儴鍒嗕紶鍏ョ殑鏁版嵁鎴戜笉纭畾
         .upg_rst_i(rst),
         .upg_clk_i(clock),
         .upg_wen_i(MemWrite),
@@ -147,6 +162,7 @@ wire[4:0] wr;//目标寄存器的编号
      wire switchctrl;
      wire ledctrl;
      wire ioread_data;
+
      io sys_io(
         .mRead(MemRead),
         .mWrite(MemWrite),
@@ -156,19 +172,19 @@ wire[4:0] wr;//目标寄存器的编号
         .Mdata(ram_data),
         .Rdata(ReadData1),
         .bdata(button_out),//data from button(io)
-        .addr(ALUResult),
-        .r_data(ReadData2),
+        .addr(address_io),
+        .r_data(r_data),
         .w_data(WriteData),
         .LEDCtrl(ledctrl),
         .SwitchCtrl(switchctrl)
         );
-    ioread ioread(
-        .reset(rst),
-        .ior(MemtoReg),
-        .switchctrl(switchctrl),
-        .ioread_data(ioread_data),//data to io
-        .ioread_data_switch(button_out)//data from button
-    );
+  //  ioread ioread(
+    //    .reset(rst),
+      //  .ior(MemtoReg),
+        //.switchctrl(switchctrl),
+        //.ioread_data(ioread_data),//data to io
+        //.ioread_data_switch(button_out)//data from button
+   // );
 
 
     button button(
@@ -196,50 +212,11 @@ wire[4:0] wr;//目标寄存器的编号
     .ledrst(rst),
     .ledwrite(RegWrite),
     .ledcs(ledctrl),
-    .ledaddr(2'b00),//直接取末16位
+    .ledaddr(2'b00),//鐩存帴鍙栨湯16浣 
     .ledwdata(WriteData[15:0]),
     .ledout(led_out)
     );
-    wire [35:0]vga_data
-    vga_ctrl vctrl (
-        .clk(clock),
-        .rst(rst),
-        .vga_ctrl(ledctrl),
-        .data_in(button_in[2:0]),
-
-        .data(vga_data)
-    );
-
-    VGA vga (
-        .clk(clock),
-        .rst(rst),
-        .vc_data(vga_data),
-        .rgb(rgb),
-        .vs(v_vs),
-        .hs(v_hs)
-    );
-    // 跳转j类型或分支类型的PC更新逻辑
-    //没想好PC的更新逻辑放在这里妥不妥
-    always @(*) begin
-        if (!rst) begin
-            NextPC = 32'h00000000;
-        end else
-        if (Branch) begin
-            case (BranchType)
-               3'b000: NextPC = zero ? (pc + (imm32 << 1)) : (pc + 4); // beq
-                3'b001: NextPC = !zero ? (pc + (imm32 << 1)) : (pc + 4); // bne
-                3'b100: NextPC = less ? (pc + (imm32 << 1)) : (pc + 4); // blt
-                3'b101: NextPC = !less ? (pc + (imm32 << 1)) : (pc + 4); // bge
-                3'b110: NextPC = less ? (pc + (imm32 << 1)) : (pc + 4); // bltu
-                3'b111: NextPC = !less ? (pc + (imm32 << 1)) : (pc + 4); // bgeu
-                default: NextPC = pc + 4;
-            endcase
-        end else if (Jump) begin
-            NextPC = ALUResult; // 跳转指令（JALR 或 JAL）
-        end else begin
-            NextPC = pc + 4;
-        end
-    end
+   
     //Part for uart 
     // UART Programmer Pinouts
     wire upg_clk, upg_clk_o;
@@ -251,3 +228,5 @@ wire[4:0] wr;//目标寄存器的编号
     wire [31:0] upg_dat_o;
 
 endmodule
+
+
