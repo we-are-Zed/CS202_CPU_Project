@@ -67,14 +67,14 @@ wire[4:0] wr;//閻╊喗鐖ｇ?靛嫬鐡ㄩ崳銊ф畱缂傛牕褰?
     assign funct7 = inst[31:25];
     assign next_pc_wire = NextPC;
     
-    keyDeb ck (
-        .clk(clk),
-        .rst(rst),
-         .key_i(check_ww),
-       .key_o(check)
-      );
+   // keyDeb ck (
+     //   .clk(clk),
+       // .rst(rst),
+         //.key_i(check_ww),
+      // .key_o(check)
+      //);
 
-    cpuclk cpuclk(
+    clk_wiz_0 cpuclk(
     .clk_in1(clk),
     .clk_out1(clock),
         .clk_out2(uart_clk)
@@ -187,7 +187,7 @@ wire[4:0] wr;//閻╊喗鐖ｇ?靛嫬鐡ㄩ崳銊ф畱缂傛牕褰?
         .check(check),
         .addr_in(ALUResult),
         .Mdata(ram_data),
-        .Rdata(ReadData1),
+        .Rdata(ReadData2),
         .bdata(button_out),//data from button(io)
         .addr(address_io),
         .r_data(r_data),
