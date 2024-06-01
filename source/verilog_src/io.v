@@ -20,25 +20,30 @@ module io(
       wire [7:0] low_addr = addr_in[7:0];
       wire [3:0] mid_addr = addr_in[7:4];
     assign addr=addr_in;
-    reg[15:0]iodata;//choose only one bit from board, or 16 bit from bodard
+    reg[15:0]iodata;
     assign r_data=(ioRead==1)?{16'b0000000000000000,iodata}:Mdata;//if we need to read data from io, then choose the final 16 bits,if
     //the data is from memory,then choose Mdata,
  //   assign LEDCtrl= (ioWrite == 1'b1)?1'b1:1'b0; // led
     assign LEDlowCtrl= (ioWrite == 1'b1&&low_addr==8'h62)?1'b1:1'b0; // led
     assign LEDmidCtrl= (ioWrite == 1'b1&&0)?1'b1:1'b0; // led
     assign LEDhighCtrl= (ioWrite == 1'b1&&low_addr==8'h60)?1'b1:1'b0; // led   
-    assign SwitchCtrl= (ioRead == 1'b1&&mid_addr==8'h70)?1'b1:1'b0; //switch 
-    assign check=(ioRead && low_addr ==8'h20) ? 1'b1:1'b0;
+    assign SwitchCtrl= (ioRead == 1'b1&&low_addr==8'h70)?1'b1:1'b0; //switch 
+    assign check_in=(ioRead && low_addr ==8'h20) ? 1'b1:1'b0;
+    wire memcheck;
+    assign memcheck=((ioWrite||ioRead)&&(low_addr==8'h74||low_addr==8'h78))?1'b1:1'b0;
         always @(*) begin
       if (SwitchCtrl) begin
             iodata = bdata;
         end else if (check_in) begin
-            iodata = {15'b0, check};
+             if(check)
+            iodata = {16'b0000_0000_0000_0001};
+            else
+           iodata=16'b0000_0000_0000_0000;
         end
     end
 
     always@* begin
-        if((mWrite==1)||(ioWrite==1)) begin
+        if((mWrite==1'b1)||(ioWrite==1'b1)) begin
                    w_data=Rdata;
               end
         
