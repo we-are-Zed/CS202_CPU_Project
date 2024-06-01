@@ -6,12 +6,15 @@ module Decoder(
     input MemRead,
     input IoRead,
     input [31:0] inst,
-    input [31:0] writeData,
+    input  [31:0] writeData,
     input [31:0] ALUResult,
     output reg [31:0] rs1Data,
     output reg [31:0] rs2Data,
     output reg [31:0] imm32
 );
+  //   reg [31:0] writeData;
+    reg [31:0] readdata2;
+  
     reg [31:0] registers [0:31]; 
 
     wire [4:0] rs1, rs2, rd;
@@ -27,8 +30,12 @@ module Decoder(
 
     initial begin
         for (i = 0; i < 31; i = i + 1) begin
-            registers[i] = 32'b0;
+             if(i!=2)begin
+                      registers[i] <= 32'b0;
+                  end
         end
+                    registers[2]<=32'h7FFFEFFC;
+
         registers[31]=32'hFFFFFC00;
     end
 
@@ -47,13 +54,15 @@ module Decoder(
      always @(*) begin
         if(lb==1'b1) begin
         if(funct3==3'b000) begin
-            writeData = {24{writeData[7]},writeData[7:0]}
+            readdata2 = {{24{writeData[7:7]}},writeData[7:0]};
         end else begin
-            writeData = {{24{1'b0}}, writeData[7:0]};
+            readdata2 = {{24{1'b0}}, writeData[7:0]};
         end
-    end
-    end
      
+    end else begin
+        readdata2 =writeData;
+    end
+   end  
     
 
 
@@ -61,12 +70,15 @@ module Decoder(
     always @(posedge clk or negedge rst) begin
         if (!rst) begin
             for (i = 0; i < 31; i = i + 1) begin
+            if(i!=2)begin
                 registers[i] <= 32'b0;
             end
+            end
+            registers[2]<=32'h7FFFEFFC;
             registers[31]<=32'hFFFFFC00;
         end else if (regWrite&&rd!=0) begin
             if(MemRead||IoRead) begin
-                registers[rd] <= writeData;
+                registers[rd] <= readdata2;
             end else begin
                 registers[rd] <= ALUResult;
             end
