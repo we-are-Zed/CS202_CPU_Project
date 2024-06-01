@@ -21,18 +21,18 @@ module ALU(
 );
 
     reg [31:0] operand2;
+
     
     always @(*) begin
     operand2 = (ALUSrc) ? imm32 : ReadData2;
-        ALUResult =32'b0;
-        zero = 1'b0;
-        less = 1'b0;
+       
+
         if (Jump&&lui!=1'b1) begin
             if(jalr ==1'b1) begin
                 ALUResult = pc_reg + 4;
             end
             else begin
-            ALUResult = (ReadData1 + operand2) & ~1;
+            ALUResult = pc_reg + 4;
             end
         end 
         else if (lui==1'b1) begin
