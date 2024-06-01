@@ -68,4 +68,3 @@ module IFetch(
     assign inst = instruction;
 
 endmodule
-
