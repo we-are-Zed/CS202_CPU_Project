@@ -48,7 +48,7 @@ module Controller(
     assign R_type = (opcode == R_TYPE)? 1'b1 : 1'b0;
     assign I_type = (opcode == I_TYPE)? 1'b1 : 1'b0;
     assign lw = (opcode == LOAD&&funct3==3'b010)? 1'b1 : 1'b0;
-    assign lb = (opcode == LOAD&&funct3==3'b000)? 1'b1 : 1'b0;
+    assign lb = (opcode == LOAD&&(funct3==3'b000||funct3==3'b100))? 1'b1 : 1'b0;
     assign lbu = (opcode == LOAD&&funct3==3'b100)? 1'b1 : 1'b0;
     assign sw = (opcode == STORE&&funct3==3'b010)? 1'b1 : 1'b0;
     assign Jump = (opcode == JALR||opcode==JAL)? 1'b1 : 1'b0;
