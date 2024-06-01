@@ -6,7 +6,10 @@ module cpu_top(
     output wire [23:0] led_out,
     output [7:0] seg_out
 );
- 
+//wire rst;
+//assign rst=~rst1;
+ wire check;
+//assign check=check_ww;// do not keydeb
  wire ioRead;
  wire [31:0] ALUResult;
  wire [31:0] inst;
@@ -31,7 +34,7 @@ module cpu_top(
     wire [31:0] ReadData1, ReadData2;
    // wire imm32;
     //wire [31:0] ALUResult;
-    //wire [2:0] funct3;
+    wire [2:0] funct3;
     wire [6:0] funct7;
     wire ALUSrc;
     wire Branch;
@@ -64,12 +67,12 @@ wire[4:0] wr;//閻╊喗鐖ｇ?靛嫬鐡ㄩ崳銊ф畱缂傛牕褰?
     assign funct7 = inst[31:25];
     assign next_pc_wire = NextPC;
     
-        keyDeb ck (
-            .clk(clk),
-            .rst(rst),
-            .key_i(check_ww),
-            .key_o(check)
-        );
+    keyDeb ck (
+        .clk(clk),
+        .rst(rst),
+         .key_i(check_ww),
+       .key_o(check)
+      );
 
     cpuclk cpuclk(
     .clk_in1(clk),
@@ -153,20 +156,19 @@ wire[4:0] wr;//閻╊喗鐖ｇ?靛嫬鐡ㄩ崳銊ф畱缂傛牕褰?
         .less(less)
     );
 
-    memory mem(
+    memory mm(
         .ram_clk_i(clock),
         .ram_wen_i(MemWrite),
         .ram_adr_i(address_io),
-        .ram_dat_i(ReadData2),
+        .ram_dat_i(WriteData),
         .ram_dat_o(ram_data),
-        
-        // UART鏉╂瑩鍎撮崚鍡曠炊閸忋儳娈戦弫鐗堝祦閹存垳绗夌涵顔肩暰
+      
         .upg_rst_i(rst),
         .upg_clk_i(clock),
         .upg_wen_i(MemWrite),
         .upg_adr_i(ALUResult[15:2]),
         .upg_dat_i(ReadData2),
-        .upg_done_i(1'b1),
+        .upg_done_i(1'b1)
         //.funct3(funct3)
     );
 
@@ -182,6 +184,7 @@ wire[4:0] wr;//閻╊喗鐖ｇ?靛嫬鐡ㄩ崳銊ф畱缂傛牕褰?
         .mWrite(MemWrite),
         .ioRead(ioRead),
         .ioWrite(ioWrite),
+        .check(check),
         .addr_in(ALUResult),
         .Mdata(ram_data),
         .Rdata(ReadData1),
@@ -231,7 +234,7 @@ wire[4:0] wr;//閻╊喗鐖ｇ?靛嫬鐡ㄩ崳銊ф畱缂傛牕褰?
     .ledmid(LEDmidCtrl),
     .ledhigh(LEDhighCtrl),
  //   .ledaddr(2'b00),//閻╁瓨甯撮崣鏍ㄦ汞16娴? 
-    .ledwdata(WriteData[15:0]),
+    .ledwdata(ReadData2[15:0]),
     .ledout(led_out)
     );
    
