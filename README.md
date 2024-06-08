@@ -154,7 +154,23 @@ seg_ctrl:
 
 seg_transform:
 
+keydeb:
+
 top：此模块可以看作是cpu的连接模块，也是coe烧入后程序的主入口。top的输入只包含clk，rst，check，button输入，输出则是led和seg（用作上板展示）。在top中，所有需要被用来连接两个模块的中间线被声明，并且在实例化模块的时候用wire将数据连接。除开在其他模块中被提前实例或包装的模块，top需要实例化系统时钟，ifetch，decoder，controller，alu，memory，io，button，seg，led等所有核心模块。
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `rst1`        | FPGA 复位信号                                |
+| `clk`        | FPGA 时钟信号                                |
+| `button_in`       | 16 位开关输入                                |
+| `check_ww`          | check信号                                   |
+| `row`             | 键盘行输入                                   |
+| `col`             | 键盘列输出                                   |
+| `led_out`          | 23 位 LED 输出                               |
+| `v_rgb`           | VGA 红绿蓝色彩输出                           |
+| `v_vs`            | VGA 垂直同步信号输出                         |
+| `v_hs`            | VGA 水平同步信号输出                         |
+| `segment_led`         | 数码管输出                                   |
+| `seg_en`          | 数码管使能                                   |
 
 
 
@@ -199,3 +215,6 @@ top：此模块可以看作是cpu的连接模块，也是coe烧入后程序的�
 - lui：在Controller模块里新增一个lui信号作为输出，连接到ALU模块里，若lui信号为1，则ALUResult = imm32，因为设计之初，我们让所有需要对立即数imm进行移位操作的指令都在Decoder模块里对imm的摘取做预处理：以lui为例imm32 = {inst[31:12], 12'b0};这样就无需在ALU模块里进行立即数移位。其余的控制信号和li指令相同。
 - auipc：立即数的预处理同lui一样，在decoder模块里就预先进行移位。在ALU模块中，额外需要一个pc_reg信号，将pc信号整体提前半个周期，可以保留当前指令的pc值在后半个周期内正常使用，              ALUResult = pc_reg + imm32。pc_reg的生成需要在ifetch里进行操作，每次时钟下降沿的时候，pc <= NextPC，pc_reg <= pc两者同时保留，pc_reg作为另一个输出信号。
 - VGA接口：
+  Vmain:
+  vga_ctrl:
+- 
