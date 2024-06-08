@@ -176,10 +176,12 @@ Decoder：负责寄存器堆的初始化（这里的寄存器采用系统文件�
 
 ![image](/dd/decode.png)
 
-Controller：负责解析指令输出控制信号，包括MemRead，IoRead，jump，jrn，lui，auipc等信号，这些信号会送入到其他模块作为逻辑判断条件。
+Controller(组合逻辑被综合分散优化，未找到图片)：
+负责解析指令输出控制信号，包括MemRead，IoRead，jump，jrn，lui，auipc等信号，这些信号会送入到其他模块作为逻辑判断条件。
 
 
-ALU：根据controller模块输入的信号来决定具体如何进行计算，以及根据输入信号来判断第二个数据是用作立即数imm还是第二个寄存器。例如如果jalr信号为1，则结果为当前pc值+4；    operand2 = (ALUSrc) ? imm32 : ReadData2。
+ALU(组合逻辑被综合分散优化，未找到图片)：
+根据controller模块输入的信号来决定具体如何进行计算，以及根据输入信号来判断第二个数据是用作立即数imm还是第二个寄存器。例如如果jalr信号为1，则结果为当前pc值+4；    operand2 = (ALUSrc) ? imm32 : ReadData2。
 
 memory：用于包装IP核模块RAM，让接口更易于使用，通过地址信号的输入到对应的地址拿到数据并输出。
 
