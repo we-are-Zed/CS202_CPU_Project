@@ -377,9 +377,121 @@ top：此模块可以看作是cpu的连接模块，也是coe烧入后程序的�
 
 - lui：在Controller模块里新增一个lui信号作为输出，连接到ALU模块里，若lui信号为1，则ALUResult = imm32，因为设计之初，我们让所有需要对立即数imm进行移位操作的指令都在Decoder模块里对imm的摘取做预处理：以lui为例imm32 = {inst[31:12], 12'b0};这样就无需在ALU模块里进行立即数移位。其余的控制信号和li指令相同。
 - auipc：立即数的预处理同lui一样，在decoder模块里就预先进行移位。在ALU模块中，额外需要一个pc_reg信号，将pc信号整体提前半个周期，可以保留当前指令的pc值在后半个周期内正常使用，              ALUResult = pc_reg + imm32。pc_reg的生成需要在ifetch里进行操作，每次时钟下降沿的时候，pc <= NextPC，pc_reg <= pc两者同时保留，pc_reg作为另一个输出信号。
-- VGA接口：
-- vmain
+- VGA接口：通过将输入数据转换为字符图案并在VGA屏幕上显示。代码由三个主要模块组成：vga_ctrl、setchar 和 vga。vga_ctrl模块接收32位输入数据，将其转换为8个6位的字符代码；setchar模块根据字符代码生成7列8位的图案数据；vga模块利用这些图案数据生成VGA显示的RGB信号和同步信号（hs和vs）。整体思路是通过数据输入控制字符显示，实现字符在VGA屏幕上的正确显示
+- vga
+
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `rst`        | 复位信号                                |
+| `clk`        | 时钟信号                                |
+| `vc_data`          | 传入vga的数据                              |
+| `rgb`             | 传出的rgb信号                                 |
+| `hs`             | 水平同步信号                        |
+| `vs`             | 竖直同步信号                           |
+
+ 核心代码：
+ ```verilog
+   always @(posedge clk or posedge rst) begin
+        if (!rst) begin
+            rgb <= 12'b0;
+        end else if (vcount >= UP_BOUND && vcount <= DOWN_BOUND && hcount >= LEFT_BOUND && hcount <= RIGHT_BOUND) begin
+            if (vcount >= up_pos && vcount <= down_pos && hcount >= left_pos && hcount <= right_pos) begin
+                if (p[hcount-left_pos][vcount-up_pos]) begin
+                    rgb <= 12'b1111_1111_1111;
+                end else begin
+                    rgb <= 12'b0;
+                end
+            end else begin
+                rgb <= 12'b0;
+            end
+        end else begin
+            rgb <= 12'b0;
+        end
+    end
+```
+通过检查当前像素位置是否在预定义的绘制区域和图像对象内，并根据图像数据 p 数组的值来决定是否点亮该像素。复位信号确保在系统复位时将 rgb 信号清零。
+
+  ![image](/dd/vga.png)
+  
 - vga_ctrl
+ 
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `rst`        | 复位信号                                |
+| `clk`        | 时钟信号                                |
+| `vga_ctrl`          | vga选择信号                                |
+| `data_in`             | 传入的数据                                 |
+| `data_out`             | 传出的数据                           |
+
+
+ 核心代码：
+ ```verilog
+    if(!rst) begin
+            data_out <= {48'b111110_111110_111110_111110_111110_111110_111110_111110};//empty space
+        end
+         else if (!vga_ctrl) begin
+                    data_out <= data_out;
+                    end
+        else begin
+            data_out[5:0]    = {2'b00, data_in[3:0]};   // 扩展第0段4位到6位
+           data_out[11:6]   = {2'b00, data_in[7:4]};   // 扩展第1段4位到6位
+           data_out[17:12]  = {2'b00, data_in[11:8]};  // 扩展第2段4位到6位
+           data_out[23:18]  = {2'b00, data_in[15:12]}; // 扩展第3段4位到6位
+           data_out[29:24]  = {2'b00, data_in[19:16]}; // 扩展第4段4位到6位
+           data_out[35:30]  = {2'b00, data_in[23:20]}; // 扩展第5段4位到6位
+           data_out[41:36]  = {2'b00, data_in[27:24]}; // 扩展第6段4位到6位
+           data_out[47:42]  = {2'b00, data_in[31:28]}; // 扩展第7段4位到6位
+         
+        end
+```
+ 将传入的信号进行分隔以及扩展，之后传给vga中
+ 
+  ![image](/dd/vga_ctrl.png)
+  
+- setchar
+
+  
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `rst`        | 复位信号                                |
+| `clk`        | 时钟信号                                |
+| `data`          | 传入的选择数据                                 |
+| `col0`             | 第0列                                   |
+| `col1`             | 第1列                                   |
+| `col2`          |第2列                         |
+| `col3`           | 第3列                          |
+| `col4`            | 第4列                        |
+| `col5`            | 第5列                       |
+| `col6`         | 第6列                                  |
+
+ 核心代码：
+ ```verilog
+   case (data)  
+                6'b00_0000: // "0"
+							begin
+                    col0 <= 8'b0000_0000;
+                    col1 <= 8'b0011_1110;
+                    col2 <= 8'b0101_0001;
+                    col3 <= 8'b0100_1001;
+                    col4 <= 8'b0100_0101;
+                    col5 <= 8'b0011_1110;
+                    col6 <= 8'b0000_0000;
+                end
+                6'b00_0001: // "1"
+							begin
+                    col0 <= 8'b0000_0000;
+                    col1 <= 8'b0000_0000;
+                    ;
+                    col2 <= 8'b0100_0010;
+                    col3 <= 8'b0111_1111;
+                    col4 <= 8'b0100_0000;
+                    col5 <= 8'b0000_0000;
+                    ;
+                    col6 <= 8'b0000_0000;
+                end
+```
+  之后的代码部分省略
+  该部分通过分析传入的数据，来决定对应的vga显示输出（如数字1，字母a等）
 
   
  
