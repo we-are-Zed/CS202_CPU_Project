@@ -178,10 +178,49 @@ Decoder：负责寄存器堆的初始化（这里的寄存器采用系统文件�
 
 Controller(组合逻辑被综合分散优化，未找到图片)：
 负责解析指令输出控制信号，包括MemRead，IoRead，jump，jrn，lui，auipc等信号，这些信号会送入到其他模块作为逻辑判断条件。
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `inst`        |  指令                            |
+| `ALUResult`        |  ALU的结果                               |
+| `Branch`       | 判断是否是branch                          |
+| `ALUSrc`          | 判断从哪拿数据                      |
+| `MemorIOtoReg`             | 是否去向寄存器                               |
+| `MemRead`             | 是否读内存                          |
+| `MemWrite`          |是否写内存                          |
+| `IoRead`           | 是否从io中读                       |
+| `IoWrite`            | 是否往io写                |
+| `RegWrite  `            | 是否写寄存器               |
+| `ALUOp`         | ALUop的值                                  |
+| `Jump`          | 是否jump                            |
+| `jrn  `            | 判断是不是JALR            |
+| `lui`          |判断是否是lui                          |
+| `auipc`           | 判断是否是auipc                        |
+| `BranchType  `            |用于branch                   |
+| `lb  `            | 判断是否是lb                |
 
 
 ALU(组合逻辑被综合分散优化，未找到图片)：
 根据controller模块输入的信号来决定具体如何进行计算，以及根据输入信号来判断第二个数据是用作立即数imm还是第二个寄存器。例如如果jalr信号为1，则结果为当前pc值+4；    operand2 = (ALUSrc) ? imm32 : ReadData2。
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `ReadData1`        |  读取数据1                              |
+| `ReadData2`        |  读取数据2                               |
+| `imm32`       | 立即数                          |
+| `ALUOp`          | ALUop的值                      |
+| `funct3`             | function3的值                               |
+| `funct7`             | function7的值                          |
+| `BranchType`          |分支类型                          |
+| `Jump`           | 判断是否jump                        |
+| `jalr`            | 判断是否是jalr                |
+| `pc_reg  `            | 存储pc的值               |
+| `lui`         | 判断是否是lui                                  |
+| `auipc`          | 判断是否是auipc                            |
+| `ALUSrc`            | 判断数据来源               |
+| `lb`          |判断是否是lb                          |
+| `ALUResult`           | alu结果                         |
+| `zero  `            |用于branch                   |
+| `less  `            | 用于branch                |
+
 
 memory：用于包装IP核模块RAM，让接口更易于使用，通过地址信号的输入到对应的地址拿到数据并输出。
 
