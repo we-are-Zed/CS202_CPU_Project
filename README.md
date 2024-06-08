@@ -66,43 +66,32 @@
 
 | 引脚 | 规格    | 名称            | 功能        |
 | ---- | ------- | --------------- | ----------- |
-| Y9   | `input` | `switch2N4[23]` | 开关引脚 23 |
-| W9   | `input` | `switch2N4[22]` | 开关引脚 22 |
-| Y7   | `input` | `switch2N4[21]` | 开关引脚 21 |
-| Y8   | `input` | `switch2N4[20]` | 开关引脚 20 |
-| AB8  | `input` | `switch2N4[19]` | 开关引脚 19 |
-| AA8  | `input` | `switch2N4[18]` | 开关引脚 18 |
-| V8   | `input` | `switch2N4[17]` | 开关引脚 17 |
-| V9   | `input` | `switch2N4[16]` | 开关引脚 16 |
-| AB6  | `input` | `switch2N4[15]` | 开关引脚 15 |
-| AB7  | `input` | `switch2N4[14]` | 开关引脚 14 |
-| V7   | `input` | `switch2N4[13]` | 开关引脚 13 |
-| AA6  | `input` | `switch2N4[12]` | 开关引脚 12 |
-| Y6   | `input` | `switch2N4[11]` | 开关引脚 11 |
-| T6   | `input` | `switch2N4[10]` | 开关引脚 10 |
-| R6   | `input` | `switch2N4[9]`  | 开关引脚 9  |
-| V5   | `input` | `switch2N4[8]`  | 开关引脚 8  |
-| U6   | `input` | `switch2N4[7]`  | 开关引脚 7  |
-| W5   | `input` | `switch2N4[6]`  | 开关引脚 6  |
-| W6   | `input` | `switch2N4[5]`  | 开关引脚 5  |
-| U5   | `input` | `switch2N4[4]`  | 开关引脚 4  |
-| T5   | `input` | `switch2N4[3]`  | 开关引脚 3  |
-| T4   | `input` | `switch2N4[2]`  | 开关引脚 2  |
-| R4   | `input` | `switch2N4[1]`  | 开关引脚 1  |
-| W4   | `input` | `switch2N4[0]`  | 开关引脚 0  |
+| AB6  | `input` | `button_in[15]` | 开关引脚 15 |
+| AB7  | `input` | `button_in[14]` | 开关引脚 14 |
+| V7   | `input` | `button_in[13]` | 开关引脚 13 |
+| AA6  | `input` | `button_in[12]` | 开关引脚 12 |
+| Y6   | `input` | `button_in[11]` | 开关引脚 11 |
+| T6   | `input` | `button_in[10]` | 开关引脚 10 |
+| R6   | `input` | `button_in[9]`  | 开关引脚 9  |
+| V5   | `input` | `button_in[8]`  | 开关引脚 8  |
+| U6   | `input` | `button_in[7]`  | 开关引脚 7  |
+| W5   | `input` | `button_in[6]`  | 开关引脚 6  |
+| W6   | `input` | `button_in[5]`  | 开关引脚 5  |
+| U5   | `input` | `button_in[4]`  | 开关引脚 4  |
+| T5   | `input` | `button_in[3]`  | 开关引脚 3  |
+| T4   | `input` | `button_in[2]`  | 开关引脚 2  |
+| R4   | `input` | `button_in[1]`  | 开关引脚 1  |
+| W4   | `input` | `button_in[0]`  | 开关引脚 0  |
 
 #### 其他引脚定义：
 
 | 引脚 | 规格     | 名称       | 功能      |
 | ---- | -------- | ---------- | --------- |
-| Y19  | `input`  | `rx`       | 接收信号  |
-| V18  | `output` | `tx`       | 发送信号  |
-| Y18  | `input`  | `fpga_clk` | FPGA 时钟 |
-| P20  | `input`  | `fpga_rst` | FPGA 复位 |
-| P5   | `input`  | `start_pg` | 启动信号  |
-| P1   | `input`  | `ck_btn`   | 按钮时钟  |
+| Y18  | `input`  | `clk` | FPGA 时钟 |
+| P2   | `input`  | `check_ww` | check信号  |
+| P4   | `input`  | `rst`   | rst信号  |
 
-#### VGA|键盘|七段数码管引脚定义
+#### VGA|七段数码管引脚定义
 
 | 引脚 | 规格     | 名称         | 功能                   |
 | ---- | -------- | ------------ | ---------------------- |
@@ -120,14 +109,6 @@
 | H20  | `output` | `v_rgb[0]`   | RGB 引脚 0             |
 | M21  | `output` | `v_hs`       | 水平同步信号           |
 | L21  | `output` | `v_vs`       | 垂直同步信号           |
-| M2   | `output` | `col[3]`     | 键盘列 3               |
-| K6   | `output` | `col[2]`     | 键盘列 2               |
-| J6   | `output` | `col[1]`     | 键盘列 1               |
-| L5   | `output` | `col[0]`     | 键盘列 0               |
-| K4   | `input`  | `row[3]`     | 键盘行 3               |
-| J4   | `input`  | `row[2]`     | 键盘行 2               |
-| L3   | `input`  | `row[1]`     | 键盘行 1               |
-| K3   | `input`  | `row[0]`     | 键盘行 0               |
 | C19  | `output` | `seg_en[0]`  | 数码管使能引脚 0       |
 | E19  | `output` | `seg_en[1]`  | 数码管使能引脚 1       |
 | D19  | `output` | `seg_en[2]`  | 数码管使能引脚 2       |
@@ -136,15 +117,14 @@
 | B20  | `output` | `seg_en[5]`  | 数码管使能引脚 5       |
 | A20  | `output` | `seg_en[6]`  | 数码管使能引脚 6       |
 | A18  | `output` | `seg_en[7]`  | 数码管使能引脚 7       |
-| F15  | `output` | `seg_out[0]` | 数码管输出引脚 0       |
-| F13  | `output` | `seg_out[1]` | 数码管输出引脚 1       |
-| F14  | `output` | `seg_out[2]` | 数码管输出引脚 2       |
-| F16  | `output` | `seg_out[3]` | 数码管输出引脚 3       |
-| E17  | `output` | `seg_out[4]` | 数码管输出引脚 4       |
-| C14  | `output` | `seg_out[5]` | 数码管输出引脚 5       |
-| C15  | `output` | `seg_out[6]` | 数码管输出引脚 6       |
-| E13  | `output` | `seg_out[7]` | 数码管输出引脚 7       |
-| R1   | `input`  | `Board_end`  | 板端信号，键盘输入清空 |
+| F15  | `output` | `segment_led[0]` | 数码管输出引脚 0       |
+| F13  | `output` | `segment_led[1]` | 数码管输出引脚 1       |
+| F14  | `output` | `segment_led[2]` | 数码管输出引脚 2       |
+| F16  | `output` | `segment_led[3]` | 数码管输出引脚 3       |
+| E17  | `output` | `segment_led[4]` | 数码管输出引脚 4       |
+| C14  | `output` | `segment_led[5]` | 数码管输出引脚 5       |
+| C15  | `output` | `segment_led[6]` | 数码管输出引脚 6       |
+| E13  | `output` | `segment_led[7]` | 数码管输出引脚 7       |
 
 
 
