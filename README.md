@@ -135,10 +135,49 @@
 子模块说明：
 
 IFetch：内部先实例化prgrom instmem IP核设计，从内存模块拿到指令信息，并在时钟下降沿把下一条pc赋值给pc连线。同时还根据外部输入信号，确定指令的不同类型，进行具体的pc更新。
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `rst`        |  复位信号                                |
+| `clk`        |  时钟信号                                |
+| `button_in`       | 16 位开关输入                                |
+| `Jump`          | jump指令                             |
+| `Jalr`             | 判断jalr（jr）                                  |
+| `Branch`             | 分支指令                              |
+| `zero`          |用于nextpc的判断                          |
+| `less`           | 用于nextpc的判断                           |
+| `BranchType`            | 分支类型                       |
+| `imm32`            | 立即数                     |
+| `rs1`         | 寄存器值                                  |
+| `pc`          | pc寄存器                                |
+| `inst`            | 从指令内存中读数据                   |
+| `pc_reg`         | 存储pc值                                  |
+
+![image](/dd/ifetch.png)
+
 
 Decoder：负责寄存器堆的初始化（这里的寄存器采用系统文件自带的寄存器模块）和更新，根据输入的指令到对应的寄存器拿到数据并输出，与此同时，还需要根据具体的控制信号来决定，是否将ALU计算的结果或者内存取出的数据写回寄存器。
 
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `rst`        |  复位信号                                |
+| `clk`        |  时钟信号                                |
+| `lb`       | 检验lb指令                             |
+| `regWrite`          | 是否写入寄存器                          |
+| `MemRead`             | 是否读取内存                                 |
+| `IoRead`             | 是否从io读取                           |
+| `zero`          |用于nextpc的判断                          |
+| `inst`           | 指令                         |
+| `writeData`            | 写的数据                   |
+| `ALUResult`            | ALU的结果                |
+| `rs1Data`         | 寄存器1的数据                                  |
+| `rs2Data`          | 寄存器2的数据                            |
+| `imm32`            | 立即数                 |
+
+
+![image](/dd/decode.png)
+
 Controller：负责解析指令输出控制信号，包括MemRead，IoRead，jump，jrn，lui，auipc等信号，这些信号会送入到其他模块作为逻辑判断条件。
+
 
 ALU：根据controller模块输入的信号来决定具体如何进行计算，以及根据输入信号来判断第二个数据是用作立即数imm还是第二个寄存器。例如如果jalr信号为1，则结果为当前pc值+4；    operand2 = (ALUSrc) ? imm32 : ReadData2。
 
@@ -171,6 +210,8 @@ top：此模块可以看作是cpu的连接模块，也是coe烧入后程序的�
 | `v_hs`            | VGA 水平同步信号输出                         |
 | `segment_led`         | 数码管输出                                   |
 | `seg_en`          | 数码管使能                                   |
+
+![image](/dd/top.png)
 
 
 
@@ -215,6 +256,8 @@ top：此模块可以看作是cpu的连接模块，也是coe烧入后程序的�
 - lui：在Controller模块里新增一个lui信号作为输出，连接到ALU模块里，若lui信号为1，则ALUResult = imm32，因为设计之初，我们让所有需要对立即数imm进行移位操作的指令都在Decoder模块里对imm的摘取做预处理：以lui为例imm32 = {inst[31:12], 12'b0};这样就无需在ALU模块里进行立即数移位。其余的控制信号和li指令相同。
 - auipc：立即数的预处理同lui一样，在decoder模块里就预先进行移位。在ALU模块中，额外需要一个pc_reg信号，将pc信号整体提前半个周期，可以保留当前指令的pc值在后半个周期内正常使用，              ALUResult = pc_reg + imm32。pc_reg的生成需要在ifetch里进行操作，每次时钟下降沿的时候，pc <= NextPC，pc_reg <= pc两者同时保留，pc_reg作为另一个输出信号。
 - VGA接口：
-  Vmain:
-  vga_ctrl:
-- 
+- vmain
+- vga_ctrl
+
+  
+ 
