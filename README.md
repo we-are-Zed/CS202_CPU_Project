@@ -242,18 +242,81 @@ memory：用于包装IP核模块RAM，让接口更易于使用，通过地址信
 
 ![image](/dd/memory.png)
 
-io：
+io：通信模块，用于控制数据与外设的交互，同时将数据传到对应的模块如led，decoder等
 
-button：
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `mRead`        |  是否从内存读                            |
+| `mWrite`        |       是否写入内存                        |
+| `ioRead`       | 是否从io读                         |
+| `ioWrite`          | 是否往io写                    |
+| `check`             | 确认输入信号                            |
+| `addr_in`             |     从alu的结果来的数据               |
+| `Mdata`          |从内存来的数据                      |
+| `Rdata`           | 从寄存器堆来的数据                     |
+| `bdata`            | 从拨码开关来的数据                 |
+| `addr  `            | 去往内存的地址          |
+| `r_data`         | 去向寄存器堆的数据                              |
+| `w_data`             |      去IO或者内存的数据                |
+| `LEDlowCtrl`          |led低位选择信号                       |
+| `LEDmidCtrl`           | led中位选择信号                     |
+| `LEDhighCtrl`            | led高位选择信号                   |
+| `SwitchCtrl  `            | 拨码开关选择信号              |
+| `segctrl`         | 七段数码管选择信号                              |
 
-led：
 
-seg_ctrl:
+![image](/dd/io.png)
 
-seg_transform:
+button：16个拨码开关，用于输入
 
-keydeb:
+| 端口名称 | 功用描述                 |
+| -------- | ------------------------ |
+| `clk`    | 时钟信号                 |
+| `rst`    | 复位信号                |
+| `switchctrl`  | 选择开关的输入 |
+| `button_in`  | 拨码开关的输入    |
+| `button_out`    | 拨码开关的输出          |
 
+![image](/dd/button.png)
+
+led：24个led灯，用于显示测试场景中需要展示的数据，与lab课件一致
+
+| 端口名称 | 功用描述                 |
+| -------- | ------------------------ |
+| `led_clk`    | 时钟信号                 |
+| `ledrst`    | 复位信号                |
+| `ledwrite`  | 写入led |
+| `ledlow`  | 选择低16位    |
+| `ledmid`    | 选择8-15位            |
+| `ledhigh`  | 选择高八位|
+| `ledwdata`    | 传入数据               |
+| `ledout`  | led的输出信号 |
+
+![image](/dd/leds.png)
+
+segment:将传入的数据转化为七段数码管上对应的显示
+
+| 端口名称 | 功用描述                 |
+| -------- | ------------------------ |
+| `clk`    | 时钟信号                 |
+| `rst`    | 复位信号                |
+| `in`  | 输入数据 |
+| `segctrl`  | 数码管选择信号    |
+| `segment_led`    | 七段数码管段信号                |
+| `seg_en`  | 七段数码管使能信号 |
+
+![image](/dd/segment.png)
+
+keydeb:消抖模块，将稳定的信号传给其他的模块
+
+| 端口名称 | 功用描述                 |
+| -------- | ------------------------ |
+| `clk`    | 时钟输入                 |
+| `rst`    | reset信号                |
+| `key_i`  | 输入消抖前的按键信号 |
+| `key_o`  | 输出消抖后的按键信号     |
+
+![image](/dd/keydeb.png)
 top：此模块可以看作是cpu的连接模块，也是coe烧入后程序的主入口。top的输入只包含clk，rst，check，button输入，输出则是led和seg（用作上板展示）。在top中，所有需要被用来连接两个模块的中间线被声明，并且在实例化模块的时候用wire将数据连接。除开在其他模块中被提前实例或包装的模块，top需要实例化系统时钟，ifetch，decoder，controller，alu，memory，io，button，seg，led等所有核心模块。
 | 端口名称          | 功用描述                                     |
 | ----------------- | -------------------------------------------- |
