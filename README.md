@@ -130,31 +130,210 @@
 
 ### CPU内部结构
 
-（连接关系图）
 
 子模块说明：
 
 IFetch：内部先实例化prgrom instmem IP核设计，从内存模块拿到指令信息，并在时钟下降沿把下一条pc赋值给pc连线。同时还根据外部输入信号，确定指令的不同类型，进行具体的pc更新。
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `rst`        |  复位信号                                |
+| `clk`        |  时钟信号                                |
+| `button_in`       | 16 位开关输入                                |
+| `Jump`          | jump指令                             |
+| `Jalr`             | 判断jalr（jr）                                  |
+| `Branch`             | 分支指令                              |
+| `zero`          |用于nextpc的判断                          |
+| `less`           | 用于nextpc的判断                           |
+| `BranchType`            | 分支类型                       |
+| `imm32`            | 立即数                     |
+| `rs1`         | 寄存器值                                  |
+| `pc`          | pc寄存器                                |
+| `inst`            | 从指令内存中读数据                   |
+| `pc_reg`         | 存储pc值                                  |
+
+![image](/dd/ifetch.png)
+
 
 Decoder：负责寄存器堆的初始化（这里的寄存器采用系统文件自带的寄存器模块）和更新，根据输入的指令到对应的寄存器拿到数据并输出，与此同时，还需要根据具体的控制信号来决定，是否将ALU计算的结果或者内存取出的数据写回寄存器。
 
-Controller：负责解析指令输出控制信号，包括MemRead，IoRead，jump，jrn，lui，auipc等信号，这些信号会送入到其他模块作为逻辑判断条件。
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `rst`        |  复位信号                                |
+| `clk`        |  时钟信号                                |
+| `lb`       | 检验lb指令                             |
+| `regWrite`          | 是否写入寄存器                          |
+| `MemRead`             | 是否读取内存                                 |
+| `IoRead`             | 是否从io读取                           |
+| `zero`          |用于nextpc的判断                          |
+| `inst`           | 指令                         |
+| `writeData`            | 写的数据                   |
+| `ALUResult`            | ALU的结果                |
+| `rs1Data`         | 寄存器1的数据                                  |
+| `rs2Data`          | 寄存器2的数据                            |
+| `imm32`            | 立即数                 |
 
-ALU：根据controller模块输入的信号来决定具体如何进行计算，以及根据输入信号来判断第二个数据是用作立即数imm还是第二个寄存器。例如如果jalr信号为1，则结果为当前pc值+4；    operand2 = (ALUSrc) ? imm32 : ReadData2。
+
+![image](/dd/decode.png)
+
+Controller(组合逻辑被综合分散优化，未找到图片)：
+负责解析指令输出控制信号，包括MemRead，IoRead，jump，jrn，lui，auipc等信号，这些信号会送入到其他模块作为逻辑判断条件。
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `inst`        |  指令                            |
+| `ALUResult`        |  ALU的结果                               |
+| `Branch`       | 判断是否是branch                          |
+| `ALUSrc`          | 判断从哪拿数据                      |
+| `MemorIOtoReg`             | 是否去向寄存器                               |
+| `MemRead`             | 是否读内存                          |
+| `MemWrite`          |是否写内存                          |
+| `IoRead`           | 是否从io中读                       |
+| `IoWrite`            | 是否往io写                |
+| `RegWrite  `            | 是否写寄存器               |
+| `ALUOp`         | ALUop的值                                  |
+| `Jump`          | 是否jump                            |
+| `jrn  `            | 判断是不是JALR            |
+| `lui`          |判断是否是lui                          |
+| `auipc`           | 判断是否是auipc                        |
+| `BranchType  `            |用于branch                   |
+| `lb  `            | 判断是否是lb                |
+
+
+ALU(组合逻辑被综合分散优化，未找到图片)：
+根据controller模块输入的信号来决定具体如何进行计算，以及根据输入信号来判断第二个数据是用作立即数imm还是第二个寄存器。例如如果jalr信号为1，则结果为当前pc值+4；    operand2 = (ALUSrc) ? imm32 : ReadData2。
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `ReadData1`        |  读取数据1                              |
+| `ReadData2`        |  读取数据2                               |
+| `imm32`       | 立即数                          |
+| `ALUOp`          | ALUop的值                      |
+| `funct3`             | function3的值                               |
+| `funct7`             | function7的值                          |
+| `BranchType`          |分支类型                          |
+| `Jump`           | 判断是否jump                        |
+| `jalr`            | 判断是否是jalr                |
+| `pc_reg  `            | 存储pc的值               |
+| `lui`         | 判断是否是lui                                  |
+| `auipc`          | 判断是否是auipc                            |
+| `ALUSrc`            | 判断数据来源               |
+| `lb`          |判断是否是lb                          |
+| `ALUResult`           | alu结果                         |
+| `zero  `            |用于branch                   |
+| `less  `            | 用于branch                |
+
 
 memory：用于包装IP核模块RAM，让接口更易于使用，通过地址信号的输入到对应的地址拿到数据并输出。
 
-io：
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `ram_clk_i`        |  时钟信号                               |
+| `ram_wen_i`        |       写使能信号                          |
+| `ram_adr_i`       | alu的结果地址值                          |
+| `ram_dat_i`          | readdata2值                       |
+| `ram_dat_o`             | ram的数据值                               |
+| `upg_rst_i`             |      uart复位信号                  |
+| `upg_clk_i`          |uart时钟信号                       |
+| `upg_wen_i`           | uart写使能信号                        |
+| `upg_adr_i`            | uart的结果地址值                   |
+| `upg_dat_i  `            | uart写数据              |
+| `upg_done_i`         | 是否完成                                |
 
-button：
 
-led：
 
-seg_ctrl:
+![image](/dd/memory.png)
 
-seg_transform:
+io：通信模块，用于控制数据与外设的交互，同时将数据传到对应的模块如led，decoder等
+
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `mRead`        |  是否从内存读                            |
+| `mWrite`        |       是否写入内存                        |
+| `ioRead`       | 是否从io读                         |
+| `ioWrite`          | 是否往io写                    |
+| `check`             | 确认输入信号                            |
+| `addr_in`             |     从alu的结果来的数据               |
+| `Mdata`          |从内存来的数据                      |
+| `Rdata`           | 从寄存器堆来的数据                     |
+| `bdata`            | 从拨码开关来的数据                 |
+| `addr  `            | 去往内存的地址          |
+| `r_data`         | 去向寄存器堆的数据                              |
+| `w_data`             |      去IO或者内存的数据                |
+| `LEDlowCtrl`          |led低位选择信号                       |
+| `LEDmidCtrl`           | led中位选择信号                     |
+| `LEDhighCtrl`            | led高位选择信号                   |
+| `SwitchCtrl  `            | 拨码开关选择信号              |
+| `segctrl`         | 七段数码管选择信号                              |
+
+
+![image](/dd/io.png)
+
+button：16个拨码开关，用于输入
+
+| 端口名称 | 功用描述                 |
+| -------- | ------------------------ |
+| `clk`    | 时钟信号                 |
+| `rst`    | 复位信号                |
+| `switchctrl`  | 选择开关的输入 |
+| `button_in`  | 拨码开关的输入    |
+| `button_out`    | 拨码开关的输出          |
+
+![image](/dd/button.png)
+
+led：24个led灯，用于显示测试场景中需要展示的数据，与lab课件一致
+
+| 端口名称 | 功用描述                 |
+| -------- | ------------------------ |
+| `led_clk`    | 时钟信号                 |
+| `ledrst`    | 复位信号                |
+| `ledwrite`  | 写入led |
+| `ledlow`  | 选择低16位    |
+| `ledmid`    | 选择8-15位            |
+| `ledhigh`  | 选择高八位|
+| `ledwdata`    | 传入数据               |
+| `ledout`  | led的输出信号 |
+
+![image](/dd/leds.png)
+
+segment:将传入的数据转化为七段数码管上对应的显示
+
+| 端口名称 | 功用描述                 |
+| -------- | ------------------------ |
+| `clk`    | 时钟信号                 |
+| `rst`    | 复位信号                |
+| `in`  | 输入数据 |
+| `segctrl`  | 数码管选择信号    |
+| `segment_led`    | 七段数码管段信号                |
+| `seg_en`  | 七段数码管使能信号 |
+
+![image](/dd/segment.png)
+
+keydeb:消抖模块，将稳定的信号传给其他的模块
+
+| 端口名称 | 功用描述                 |
+| -------- | ------------------------ |
+| `clk`    | 时钟输入                 |
+| `rst`    | reset信号                |
+| `key_i`  | 输入消抖前的按键信号 |
+| `key_o`  | 输出消抖后的按键信号     |
+
+![image](/dd/keydeb.png)
 
 top：此模块可以看作是cpu的连接模块，也是coe烧入后程序的主入口。top的输入只包含clk，rst，check，button输入，输出则是led和seg（用作上板展示）。在top中，所有需要被用来连接两个模块的中间线被声明，并且在实例化模块的时候用wire将数据连接。除开在其他模块中被提前实例或包装的模块，top需要实例化系统时钟，ifetch，decoder，controller，alu，memory，io，button，seg，led等所有核心模块。
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `rst1`        | FPGA 复位信号                                |
+| `clk`        | FPGA 时钟信号                                |
+| `button_in`       | 16 位开关输入                                |
+| `check_ww`          | check信号                                   |
+| `row`             | 键盘行输入                                   |
+| `col`             | 键盘列输出                                   |
+| `led_out`          | 23 位 LED 输出                               |
+| `v_rgb`           | VGA 红绿蓝色彩输出                           |
+| `v_vs`            | VGA 垂直同步信号输出                         |
+| `v_hs`            | VGA 水平同步信号输出                         |
+| `segment_led`         | 数码管输出                                   |
+| `seg_en`          | 数码管使能                                   |
+
+![image](/dd/top.png)
 
 
 
@@ -475,4 +654,121 @@ no_increment_negative2:
 
 - lui：在Controller模块里新增一个lui信号作为输出，连接到ALU模块里，若lui信号为1，则ALUResult = imm32，因为设计之初，我们让所有需要对立即数imm进行移位操作的指令都在Decoder模块里对imm的摘取做预处理：以lui为例imm32 = {inst[31:12], 12'b0};这样就无需在ALU模块里进行立即数移位。其余的控制信号和li指令相同。
 - auipc：立即数的预处理同lui一样，在decoder模块里就预先进行移位。在ALU模块中，额外需要一个pc_reg信号，将pc信号整体提前半个周期，可以保留当前指令的pc值在后半个周期内正常使用，              ALUResult = pc_reg + imm32。pc_reg的生成需要在ifetch里进行操作，每次时钟下降沿的时候，pc <= NextPC，pc_reg <= pc两者同时保留，pc_reg作为另一个输出信号。
-- VGA接口：
+- VGA接口：通过将输入数据转换为字符图案并在VGA屏幕上显示。代码由三个主要模块组成：vga_ctrl、setchar 和 vga。vga_ctrl模块接收32位输入数据，将其转换为8个6位的字符代码；setchar模块根据字符代码生成7列8位的图案数据；vga模块利用这些图案数据生成VGA显示的RGB信号和同步信号（hs和vs）。整体思路是通过数据输入控制字符显示，实现字符在VGA屏幕上的正确显示
+- vga
+
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `rst`        | 复位信号                                |
+| `clk`        | 时钟信号                                |
+| `vc_data`          | 传入vga的数据                              |
+| `rgb`             | 传出的rgb信号                                 |
+| `hs`             | 水平同步信号                        |
+| `vs`             | 竖直同步信号                           |
+
+ 核心代码：
+ ```verilog
+   always @(posedge clk or posedge rst) begin
+        if (!rst) begin
+            rgb <= 12'b0;
+        end else if (vcount >= UP_BOUND && vcount <= DOWN_BOUND && hcount >= LEFT_BOUND && hcount <= RIGHT_BOUND) begin
+            if (vcount >= up_pos && vcount <= down_pos && hcount >= left_pos && hcount <= right_pos) begin
+                if (p[hcount-left_pos][vcount-up_pos]) begin
+                    rgb <= 12'b1111_1111_1111;
+                end else begin
+                    rgb <= 12'b0;
+                end
+            end else begin
+                rgb <= 12'b0;
+            end
+        end else begin
+            rgb <= 12'b0;
+        end
+    end
+```
+通过检查当前像素位置是否在预定义的绘制区域和图像对象内，并根据图像数据 p 数组的值来决定是否点亮该像素。复位信号确保在系统复位时将 rgb 信号清零。
+
+  ![image](/dd/vga.png)
+  
+- vga_ctrl
+ 
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `rst`        | 复位信号                                |
+| `clk`        | 时钟信号                                |
+| `vga_ctrl`          | vga选择信号                                |
+| `data_in`             | 传入的数据                                 |
+| `data_out`             | 传出的数据                           |
+
+
+ 核心代码：
+ ```verilog
+    if(!rst) begin
+            data_out <= {48'b111110_111110_111110_111110_111110_111110_111110_111110};//empty space
+        end
+         else if (!vga_ctrl) begin
+                    data_out <= data_out;
+                    end
+        else begin
+            data_out[5:0]    = {2'b00, data_in[3:0]};   // 扩展第0段4位到6位
+           data_out[11:6]   = {2'b00, data_in[7:4]};   // 扩展第1段4位到6位
+           data_out[17:12]  = {2'b00, data_in[11:8]};  // 扩展第2段4位到6位
+           data_out[23:18]  = {2'b00, data_in[15:12]}; // 扩展第3段4位到6位
+           data_out[29:24]  = {2'b00, data_in[19:16]}; // 扩展第4段4位到6位
+           data_out[35:30]  = {2'b00, data_in[23:20]}; // 扩展第5段4位到6位
+           data_out[41:36]  = {2'b00, data_in[27:24]}; // 扩展第6段4位到6位
+           data_out[47:42]  = {2'b00, data_in[31:28]}; // 扩展第7段4位到6位
+         
+        end
+```
+ 将传入的信号进行分隔以及扩展，之后传给vga中
+ 
+  ![image](/dd/vga_ctrl.png)
+  
+- setchar
+
+  
+| 端口名称          | 功用描述                                     |
+| ----------------- | -------------------------------------------- |
+| `rst`        | 复位信号                                |
+| `clk`        | 时钟信号                                |
+| `data`          | 传入的选择数据                                 |
+| `col0`             | 第0列                                   |
+| `col1`             | 第1列                                   |
+| `col2`          |第2列                         |
+| `col3`           | 第3列                          |
+| `col4`            | 第4列                        |
+| `col5`            | 第5列                       |
+| `col6`         | 第6列                                  |
+
+ 核心代码：
+ ```verilog
+   case (data)  
+                6'b00_0000: // "0"
+							begin
+                    col0 <= 8'b0000_0000;
+                    col1 <= 8'b0011_1110;
+                    col2 <= 8'b0101_0001;
+                    col3 <= 8'b0100_1001;
+                    col4 <= 8'b0100_0101;
+                    col5 <= 8'b0011_1110;
+                    col6 <= 8'b0000_0000;
+                end
+                6'b00_0001: // "1"
+							begin
+                    col0 <= 8'b0000_0000;
+                    col1 <= 8'b0000_0000;
+                    ;
+                    col2 <= 8'b0100_0010;
+                    col3 <= 8'b0111_1111;
+                    col4 <= 8'b0100_0000;
+                    col5 <= 8'b0000_0000;
+                    ;
+                    col6 <= 8'b0000_0000;
+                end
+```
+  之后的代码部分省略
+  该部分通过分析传入的数据，来决定对应的vga显示输出（如数字1，字母a等）
+
+  
+ ### 项目报告到此结束，感谢！
