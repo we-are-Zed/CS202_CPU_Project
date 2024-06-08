@@ -19,6 +19,7 @@
 
 ## CPU架构设计说明
 
+
 ### CPU特性
 
 - ISA：使用RISCV指令集架构，包换所有的基本R指令，I指令，B指令，sw，jal，jalr，lui，auipc.具体的使用方式是通过导出RISCV指令并生成为coe文件形式烧入到fpga板，所有的指令机器码将会依次在时钟对应的跳边沿送入对应模块并产生各自的信号，最终在top模块中，各个模块的连线被接上，通过时钟依次执行完每一条指令。
@@ -32,6 +33,118 @@
 
 
 ### CPU接口
+#### LED引脚定义：
+
+| 引脚 | 规格     | 名称         | 功能         |
+| ---- | -------- | ------------ | ------------ |
+| K17  | `output` | `led_out[23]` | LED 引脚 23  |
+| L13  | `output` | `led_out[22]` | LED 引脚 22  |
+| M13  | `output` | `led_out[21]` | LED 引脚 21  |
+| K14  | `output` | `led_out[20]` | LED 引脚 20  |
+| K13  | `output` | `led_out[19]` | LED 引脚 19  |
+| M20  | `output` | `led_out[18]` | LED 引脚 18  |
+| N20  | `output` | `led_out[17]` | LED 引脚 17  |
+| N19  | `output` | `led_out[16]` | LED 引脚 16  |
+| M17  | `output` | `led_out[15]` | LED  引脚 15 |
+| M16  | `output` | `led_out[14]` | LED 引脚 14  |
+| M15  | `output` | `led_out[13]` | LED 引脚 13  |
+| K16  | `output` | `led_out[12]` | LED 引脚 12  |
+| L16  | `output` | `led_out[11]` | LED 引脚 11  |
+| L15  | `output` | `led_out[10]` | LED 引脚 10  |
+| L14  | `output` | `led_out[9]`  | LED 引脚 9   |
+| J17  | `output` | `led_out[8]`  | LED 引脚 8   |
+| F21  | `output` | `led_out[7]`  | LED 引脚 7   |
+| G22  | `output` | `led_out[6]`  | LED 引脚 6   |
+| G21  | `output` | `led_out[5]`  | LED 引脚 5   |
+| D21  | `output` | `led_out[4]`  | LED 引脚 4   |
+| E21  | `output` | `led_out[3]`  | LED 引脚 3   |
+| D22  | `output` | `led_out[2]`  | LED 引脚 2   |
+| E22  | `output` | `led_out[1]`  | LED 引脚 1   |
+| A21  | `output` | `led_out[0]`  | LED 引脚 0   |
+
+#### 开关引脚定义：
+
+| 引脚 | 规格    | 名称            | 功能        |
+| ---- | ------- | --------------- | ----------- |
+| Y9   | `input` | `switch2N4[23]` | 开关引脚 23 |
+| W9   | `input` | `switch2N4[22]` | 开关引脚 22 |
+| Y7   | `input` | `switch2N4[21]` | 开关引脚 21 |
+| Y8   | `input` | `switch2N4[20]` | 开关引脚 20 |
+| AB8  | `input` | `switch2N4[19]` | 开关引脚 19 |
+| AA8  | `input` | `switch2N4[18]` | 开关引脚 18 |
+| V8   | `input` | `switch2N4[17]` | 开关引脚 17 |
+| V9   | `input` | `switch2N4[16]` | 开关引脚 16 |
+| AB6  | `input` | `switch2N4[15]` | 开关引脚 15 |
+| AB7  | `input` | `switch2N4[14]` | 开关引脚 14 |
+| V7   | `input` | `switch2N4[13]` | 开关引脚 13 |
+| AA6  | `input` | `switch2N4[12]` | 开关引脚 12 |
+| Y6   | `input` | `switch2N4[11]` | 开关引脚 11 |
+| T6   | `input` | `switch2N4[10]` | 开关引脚 10 |
+| R6   | `input` | `switch2N4[9]`  | 开关引脚 9  |
+| V5   | `input` | `switch2N4[8]`  | 开关引脚 8  |
+| U6   | `input` | `switch2N4[7]`  | 开关引脚 7  |
+| W5   | `input` | `switch2N4[6]`  | 开关引脚 6  |
+| W6   | `input` | `switch2N4[5]`  | 开关引脚 5  |
+| U5   | `input` | `switch2N4[4]`  | 开关引脚 4  |
+| T5   | `input` | `switch2N4[3]`  | 开关引脚 3  |
+| T4   | `input` | `switch2N4[2]`  | 开关引脚 2  |
+| R4   | `input` | `switch2N4[1]`  | 开关引脚 1  |
+| W4   | `input` | `switch2N4[0]`  | 开关引脚 0  |
+
+#### 其他引脚定义：
+
+| 引脚 | 规格     | 名称       | 功能      |
+| ---- | -------- | ---------- | --------- |
+| Y19  | `input`  | `rx`       | 接收信号  |
+| V18  | `output` | `tx`       | 发送信号  |
+| Y18  | `input`  | `fpga_clk` | FPGA 时钟 |
+| P20  | `input`  | `fpga_rst` | FPGA 复位 |
+| P5   | `input`  | `start_pg` | 启动信号  |
+| P1   | `input`  | `ck_btn`   | 按钮时钟  |
+
+#### VGA|键盘|七段数码管引脚定义
+
+| 引脚 | 规格     | 名称         | 功能                   |
+| ---- | -------- | ------------ | ---------------------- |
+| H15  | `output` | `v_rgb[11]`  | RGB 引脚 11            |
+| J15  | `output` | `v_rgb[10]`  | RGB 引脚 10            |
+| G18  | `output` | `v_rgb[9]`   | RGB 引脚 9             |
+| G17  | `output` | `v_rgb[8]`   | RGB 引脚 8             |
+| H22  | `output` | `v_rgb[7]`   | RGB 引脚 7             |
+| J22  | `output` | `v_rgb[6]`   | RGB 引脚 6             |
+| H18  | `output` | `v_rgb[5]`   | RGB 引脚 5             |
+| H17  | `output` | `v_rgb[4]`   | RGB 引脚 4             |
+| K22  | `output` | `v_rgb[3]`   | RGB 引脚 3             |
+| K21  | `output` | `v_rgb[2]`   | RGB 引脚2              |
+| G20  | `output` | `v_rgb[1]`   | RGB 引脚 1             |
+| H20  | `output` | `v_rgb[0]`   | RGB 引脚 0             |
+| M21  | `output` | `v_hs`       | 水平同步信号           |
+| L21  | `output` | `v_vs`       | 垂直同步信号           |
+| M2   | `output` | `col[3]`     | 键盘列 3               |
+| K6   | `output` | `col[2]`     | 键盘列 2               |
+| J6   | `output` | `col[1]`     | 键盘列 1               |
+| L5   | `output` | `col[0]`     | 键盘列 0               |
+| K4   | `input`  | `row[3]`     | 键盘行 3               |
+| J4   | `input`  | `row[2]`     | 键盘行 2               |
+| L3   | `input`  | `row[1]`     | 键盘行 1               |
+| K3   | `input`  | `row[0]`     | 键盘行 0               |
+| C19  | `output` | `seg_en[0]`  | 数码管使能引脚 0       |
+| E19  | `output` | `seg_en[1]`  | 数码管使能引脚 1       |
+| D19  | `output` | `seg_en[2]`  | 数码管使能引脚 2       |
+| F18  | `output` | `seg_en[3]`  | 数码管使能引脚 3       |
+| E18  | `output` | `seg_en[4]`  | 数码管使能引脚 4       |
+| B20  | `output` | `seg_en[5]`  | 数码管使能引脚 5       |
+| A20  | `output` | `seg_en[6]`  | 数码管使能引脚 6       |
+| A18  | `output` | `seg_en[7]`  | 数码管使能引脚 7       |
+| F15  | `output` | `seg_out[0]` | 数码管输出引脚 0       |
+| F13  | `output` | `seg_out[1]` | 数码管输出引脚 1       |
+| F14  | `output` | `seg_out[2]` | 数码管输出引脚 2       |
+| F16  | `output` | `seg_out[3]` | 数码管输出引脚 3       |
+| E17  | `output` | `seg_out[4]` | 数码管输出引脚 4       |
+| C14  | `output` | `seg_out[5]` | 数码管输出引脚 5       |
+| C15  | `output` | `seg_out[6]` | 数码管输出引脚 6       |
+| E13  | `output` | `seg_out[7]` | 数码管输出引脚 7       |
+| R1   | `input`  | `Board_end`  | 板端信号，键盘输入清空 |
 
 
 
